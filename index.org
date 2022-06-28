@@ -1,0 +1,110 @@
+#+title: Roguelike Dev
+#+date: <2022-06-28 Tue>
+#+options: toc:nil
+
+Each summer r/roguelikedev has a [[https://old.reddit.com/r/roguelikedev/wiki/python_tutorial_series][summer event]] in which we all make a simple roguelike, roughly following the libtcod roguelike tutorial. I've tried several times and [[href:/x/2025-roguelike-dev/][actually finished in 2020]], using [[https://ondras.github.io/rot.js/hp/][rot.js]] and Javascript. I kept the scope down by implementing only the topics from the tutorial. Then [[href:/x/2126-roguelike-dev/][in 2021]] I implemented topics I wanted to try: thin walls, graphics, animations, openable doors, new map generator. I had many more things I wanted to try but I was too ambitious.
+
+For this year's summer event I'd like to do something more "fortress mode" and less "adventure mode". 
+
+#+include: "game.html" export html
+
+(Icons from [[https://game-icons.net][game-icons.net]], CC BY 3.0, see source of [[href:_symbol-table.html]] for list of sprites and their authors)
+
+#+TOC: headlines 2
+
+1. map generation will be a wilderness map, not a dungeon map
+1. you'll dig and build on the map to make your own settlement
+1. no field of view; you can see everything
+1. scrolling map
+1. there will be friendly npcs
+
+* Setting up
+:PROPERTIES:
+:UNNUMBERED: t
+:SECTION_NUMBER: 0
+:CUSTOM_ID: setting-up
+:END:
+
+Compared to a Python project, I feel the set up is simpler in Javascript. Even if I were using rot.js this time, importing it is one =<script>= line in the html file. But Typescript adds a little bit more complexity, as I need to compile it. I've been using [[https://esbuild.github.io/][esbuild]] to build and I really like it. I have lots of small projects and have standardized on having a file called ~./build.sh~ that will build the project. Then I have my editor run =build.sh= whenever I save a file.
+
+#+begin_src sh
+#!/bin/sh
+mkdir -p build/
+esbuild roguelike-dev.ts --bundle --sourcemap --outfile=build/_bundle.js
+#+end_src
+
+There's a [[https://devblogs.microsoft.com/typescript/a-proposal-for-type-syntax-in-javascript/][proposal to allow but ignore types in Javascript's syntax]], similar to what Python does. If that passes, then I won't need this build step until I'm ready for an optimized production build. Fortunately the build step takes 0.06 seconds and it runs automatically so I'm not particularly worried about it.
+
+For the rest of this project I'm going to /try/ to follow the same section numbers as the original Python tutorial and the r/roguelikedev summer event, but some topics won't make sense in fortress mode so I will do something else instead.
+
+* TODO Moving around
+:PROPERTIES:
+:CUSTOM_ID: moving-around
+:END:
+
+* TODO Entity, render, map
+:PROPERTIES:
+:CUSTOM_ID: entity-render-map
+:END:
+
+* TODO Generating a map
+:PROPERTIES:
+:CUSTOM_ID: generating-a-map
+:END:
+
+* TODO Field of view
+:PROPERTIES:
+:CUSTOM_ID: field-of-view
+:END:
+
+* TODO Placing enemies
+:PROPERTIES:
+:CUSTOM_ID: placing-enemies
+:END:
+
+* TODO Combat
+:PROPERTIES:
+:CUSTOM_ID: combat
+:END:
+
+* TODO Interface
+:PROPERTIES:
+:CUSTOM_ID: interface
+:END:
+
+* TODO Items and inventory
+:PROPERTIES:
+:CUSTOM_ID: items-and-inventory
+:END:
+
+* TODO Ranged scrolls and targeting
+:PROPERTIES:
+:CUSTOM_ID: ranged-scrolls-and-targeting
+:END:
+
+* TODO Saving and loading
+:PROPERTIES:
+:CUSTOM_ID: saving-and-loading
+:END:
+
+* TODO Dungeon levels
+:PROPERTIES:
+:CUSTOM_ID: dungeon-levels
+:END:
+
+* TODO Increasing difficulty
+:PROPERTIES:
+:CUSTOM_ID: increasing-difficulty
+:END:
+
+* TODO Gearing up
+:PROPERTIES:
+:CUSTOM_ID: gearing-up
+:END:
+
+#+begin_export html
+<x:footer>
+  Created 28 Jun 2022; &#160;
+  <!-- hhmts start -->Last modified: 28 Jun 2022<!-- hhmts end -->
+</x:footer>
+#+end_export
