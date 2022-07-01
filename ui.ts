@@ -5,3 +5,19 @@
  */
 
 export { print } from "./console";
+
+import g_person from "./game-icons/delapouite/person.svg";
+import g_rooster from "./game-icons/delapouite/rooster.svg";
+
+function mkSprite(svg: String): Path2D {
+    // This relies on the way game-icons.net svgs are structured,
+    // as a single <path d="…"/>
+    return new Path2D(svg.replace(/.* d="/, "").replace(/".*/, ""));
+}
+
+export const sprites = {
+    person: mkSprite(g_person),
+    rooster: mkSprite(g_rooster),
+};
+
+
