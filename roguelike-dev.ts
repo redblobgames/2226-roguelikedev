@@ -23,12 +23,16 @@ if (window.devicePixelRatio && window.devicePixelRatio != 1) {
 }
 
 // Handle keyboard focus
-const instructions = document.querySelector("#focus-instructions");
+const focusInstructions = document.querySelector("#focus-instructions");
 canvas.setAttribute('tabindex', "1");
 canvas.addEventListener('keydown', handleKeyDown);
-canvas.addEventListener('blur', () => { instructions.classList.add('visible'); });
-canvas.addEventListener('focus', () => { instructions.classList.remove('visible'); });
+canvas.addEventListener('blur', () => { focusInstructions.classList.add('visible'); });
+canvas.addEventListener('focus', () => { focusInstructions.classList.remove('visible'); });
 canvas.focus();
+
+// Handle keyboard events
+const gameInstructions = document.querySelector("#game-instructions");
+gameInstructions.innerText = "Arrows to move";
 
 function playerMoveBy(dx, dy) {
     player.x += dx;
