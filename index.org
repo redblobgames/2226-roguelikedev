@@ -56,18 +56,21 @@ For the rest of this project I'm going to /try/ to follow the same section numbe
 :END:
 
 ** Rendering
+:PROPERTIES:
+:CUSTOM_ID: rendering
+:END:
 
 I'm using <canvas> this year, not <svg>. Conveniently, game-icons icons are all a /single <path>/, and paths can be drawn to a <canvas> using https://developer.mozilla.org/en-US/docs/Web/API/Path2D. To load the icon into memory, I can use esbuild's loaders to make importing an svg work:
 
 #+begin_src js
-import g_person from "./game-icons/delapouite/person.svg";
+import person from "./game-icons/delapouite/person.svg";
 #+end_src
 
 #+begin_src sh
 esbuild --loader:.svg=text
 #+end_src
 
-This will make =g_person= the contents of the svg file.
+This will make =person= the contents of the svg file.
 
 But I need to build a mapping from icon + style (color / gradient / outline) to tile type, or I could switch to webgl so that I could do these things in shaders. Probably not worth webgl yet. Keep it simple. One color + shape per object.
 
@@ -139,6 +142,6 @@ For the keyboard I'm mostly following what I did two years ago: [[href:/x/2025-r
 #+begin_export html
 <x:footer>
   Created 28 Jun 2022; &#160;
-  <!-- hhmts start -->Last modified: 30 Jun 2022<!-- hhmts end -->
+  <!-- hhmts start -->Last modified: 01 Jul 2022<!-- hhmts end -->
 </x:footer>
 #+end_export
