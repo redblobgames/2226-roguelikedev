@@ -7,8 +7,9 @@
 import { print, sprites } from "./ui";
 print("Hello and welcome, fortress maker!", 'welcome');
 
-const VIEWWIDTH = 17, VIEWHEIGHT = 17;
+const player = {x: 5, y: 7};
 
+const VIEWWIDTH = 17, VIEWHEIGHT = 17;
 const TILE_SIZE = 32;
 
 const canvas = document.querySelector("#game") as HTMLCanvasElement;
@@ -29,17 +30,28 @@ canvas.addEventListener('blur', () => { instructions.classList.add('visible'); }
 canvas.addEventListener('focus', () => { instructions.classList.remove('visible'); });
 canvas.focus();
 
-function handleKeyDown(event) {
-    if (event.altKey || event.ctrlKey || event.metaKey) return;
-    /*
-    let action = currentKeyHandler()(event.key);
-    if (action) {
-        event.preventDefault();
-        runAction(action);
-        }
-        */
+function playerMoveBy(dx, dy) {
+    player.x += dx;
+    player.y += dy;
+    redraw();
 }
 
+function handleKeyDown(event) {
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    let actions = {
+        ArrowRight() { playerMoveBy(+1, 0); },
+        ArrowLeft() { playerMoveBy(-1, 0); },
+        ArrowDown() { playerMoveBy(0, +1); },
+        ArrowUp()  { playerMoveBy(0, -1); },
+    };
+    if (actions[event.key]) {
+        event.preventDefault();
+        actions[event.key]();
+    }
+}
+
+
+// Drawing
 
 function drawSprite(x, y, name, color="white") {
     ctx.save();
@@ -54,8 +66,13 @@ function drawSprite(x, y, name, color="white") {
     ctx.restore();
 }
 
-for (let y = 0; y < 20; y++) {
-    for (let x = 0; x < 20; x++) {
-        drawSprite(x, y, x === 5 && y === 3 ? 'person' : 'strawbale');
+function redraw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let y = 0; y < 20; y++) {
+        for (let x = 0; x < 20; x++) {
+            drawSprite(x, y, x === player.x && y === player.y ? 'person' : 'strawbale');
+        }
     }
 }
+
+redraw();
