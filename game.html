@@ -87,15 +87,22 @@
         
     #focus-instructions {
         height: 2em;
-        grid-area: instructions;
+        padding: 0 1em;
+        grid-area: game;
         text-align: center;
+        border: 1px solid black;
+        border-radius: 1em;
         background: hsl(60, 100%, 90%);
         color: black;
         opacity: 0.0;
         transition: all 0.2s;
+        pointer-events: none;
     }
     #focus-instructions.visible {
-        opacity: 1.0;
+        opacity: 0.9;
+        z-index: 1;
+        justify-self: center;
+        align-self: center;
     }
 
     #messages, #message-overlay {

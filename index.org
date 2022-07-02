@@ -75,6 +75,9 @@ This will make =person= the contents of the svg file.
 But I need to build a mapping from icon + style (color / gradient / outline) to tile type, or I could switch to webgl so that I could do these things in shaders. Probably not worth webgl yet. Keep it simple. One color + shape per object.
 
 ** Keyboard
+:PROPERTIES:
+:CUSTOM_ID: keyboard
+:END:
 
 For the keyboard I'm mostly following what I did two years ago: [[href:/x/2025-roguelike-dev/#key-input]]
 

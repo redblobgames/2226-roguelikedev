@@ -21,6 +21,26 @@ if (window.devicePixelRatio && window.devicePixelRatio != 1) {
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
 }
 
+// Handle keyboard focus
+const instructions = document.querySelector("#focus-instructions");
+canvas.setAttribute('tabindex', "1");
+canvas.addEventListener('keydown', handleKeyDown);
+canvas.addEventListener('blur', () => { instructions.classList.add('visible'); });
+canvas.addEventListener('focus', () => { instructions.classList.remove('visible'); });
+canvas.focus();
+
+function handleKeyDown(event) {
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    /*
+    let action = currentKeyHandler()(event.key);
+    if (action) {
+        event.preventDefault();
+        runAction(action);
+        }
+        */
+}
+
+
 function drawSprite(x, y, name, color="white") {
     ctx.save();
     ctx.translate(TILE_SIZE * x, TILE_SIZE * y);
