@@ -10,10 +10,11 @@ import { map } from "./map";
 
 print("Hello and welcome, fortress maker!", 'welcome');
 
-const VIEWWIDTH = 17, VIEWHEIGHT = 17;
-const TILE_SIZE = 32;
+const TILE_SIZE = 24;
 
 const canvas = document.querySelector("#game") as HTMLCanvasElement;
+const VIEWWIDTH = Math.ceil(canvas.width / TILE_SIZE);
+const VIEWHEIGHT = Math.ceil(canvas.height / TILE_SIZE);
 const ctx = canvas.getContext('2d');
 
 // Handle hi-dpi displays
@@ -73,21 +74,24 @@ function drawSprite(x: number, y: number, name: string, color="white") {
 }
 
 function render() {
+    const unknownRender = ['strawbale', "gray"];
+    const tileRenders = {
+        grass: ['abstract50', "hsl(100, 30%, 50%)"],
+        river: ['abstract50', "hsl(250, 50%, 30%)"],
+        wall: ['wall', "brown"],
+    };
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let y = 0; y < VIEWHEIGHT; y++) {
         for (let x = 0; x < VIEWWIDTH; x++) {
             if (map.inBounds({x, y})) {
                 let tile = map.tiles.get({x, y});
-                if (tile) {
-                    drawSprite(x, y, tile, "white");
-                } else {
-                    drawSprite(x, y, 'strawbale', "gray");
-                }
+                let render = tileRenders[tile] ?? unknownRender;
+                drawSprite(x, y, render[0], render[1]);
             }
         }
     }
     for (let entity of entities) {
-        drawSprite(entity.location.x, entity.location.y, entity.appearance.sprite, "red");
+        drawSprite(entity.location.x, entity.location.y, entity.appearance.sprite, "yellow");
     }
 }
 
