@@ -13,11 +13,12 @@ function S(svg: String): Path2D {
 }
 
 export const sprites = {
-    person:  S(require("./game-icons/delapouite/person.svg")),
-    rooster: S(require("./game-icons/delapouite/rooster.svg")),
-    grass:   S(require("./game-icons/delapouite/grass.svg")),
-    wheat:   S(require("./game-icons/lorc/wheat.svg")),
-    strawbale:   S(require("./game-icons/delapouite/round-straw-bale.svg")),
+    person:    S(require("./game-icons/delapouite/person.svg")),
+    rooster:   S(require("./game-icons/delapouite/rooster.svg")),
+    grass:     S(require("./game-icons/delapouite/grass.svg")),
+    wheat:     S(require("./game-icons/lorc/wheat.svg")),
+    wall:      S(require("./game-icons/delapouite/stone-wall.svg")),
+    strawbale: S(require("./game-icons/delapouite/round-straw-bale.svg")),
 };
 
 

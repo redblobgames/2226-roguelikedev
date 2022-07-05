@@ -5,11 +5,10 @@
  */
 
 import { print, sprites } from "./ui";
-import { Entity } from "./entity";
+import { entities, player } from "./simulation";
+import { map } from "./map";
 
 print("Hello and welcome, fortress maker!", 'welcome');
-
-const player = new Entity({x: 5, y: 7}, {sprite: 'person'});
 
 const VIEWWIDTH = 17, VIEWHEIGHT = 17;
 const TILE_SIZE = 32;
@@ -36,12 +35,14 @@ canvas.focus();
 const gameInstructions = document.querySelector("#game-instructions") as HTMLElement;
 gameInstructions.innerText = "Arrows to move";
 
-function playerMoveBy(dx, dy) {
-    player.moveBy(dx, dy);
-    redraw();
+function playerMoveBy(dx: number, dy: number) {
+    if (map.inBounds({x: player.location.x + dx, y: player.location.y + dy})) {
+        player.moveBy(dx, dy);
+        render();
+    }
 }
 
-function handleKeyDown(event) {
+function handleKeyDown(event: KeyboardEvent) {
     if (event.altKey || event.ctrlKey || event.metaKey) return;
     let actions = {
         ArrowRight() { playerMoveBy(+1, 0); },
@@ -56,9 +57,9 @@ function handleKeyDown(event) {
 }
 
 
-// Drawing
+// Rendering
 
-function drawSprite(x, y, name, color="white") {
+function drawSprite(x: number, y: number, name: string, color="white") {
     ctx.save();
     ctx.translate(TILE_SIZE * x, TILE_SIZE * y);
     ctx.scale(TILE_SIZE/512, TILE_SIZE/512);
@@ -71,13 +72,23 @@ function drawSprite(x, y, name, color="white") {
     ctx.restore();
 }
 
-function redraw() {
+function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let y = 0; y < 20; y++) {
-        for (let x = 0; x < 20; x++) {
-            drawSprite(x, y, x === player.location.x && y === player.location.y ? 'person' : 'strawbale');
+    for (let y = 0; y < VIEWHEIGHT; y++) {
+        for (let x = 0; x < VIEWWIDTH; x++) {
+            if (map.inBounds({x, y})) {
+                let tile = map.tiles.get({x, y});
+                if (tile) {
+                    drawSprite(x, y, tile, "white");
+                } else {
+                    drawSprite(x, y, 'strawbale', "gray");
+                }
+            }
         }
+    }
+    for (let entity of entities) {
+        drawSprite(entity.location.x, entity.location.y, entity.appearance.sprite, "red");
     }
 }
 
-redraw();
+render();

@@ -45,7 +45,7 @@ There's a [[https://devblogs.microsoft.com/typescript/a-proposal-for-type-syntax
 
 For the rest of this project I'm going to /try/ to follow the same section numbers as the original Python tutorial and the r/roguelikedev summer event, but some topics won't make sense in fortress mode so I will do something else instead.
 
-* TODO Moving around
+* Moving around
 :PROPERTIES:
 :CUSTOM_ID: moving-around
 :END:
@@ -78,17 +78,47 @@ For the keyboard I'm mostly following what I did [[href:/x/2025-roguelike-dev/#k
 
 When the canvas has keyboard focus it will get =keydown= events with each key pressed. I might want to get both =keyup= and =keydown= because I think it might be useful for building to hold down a direction key and then press a letter to build something in that direction. I'll experiment with that when I get to building.
 
-* TODO Entity, render, map
+* Entity, render, map
 :PROPERTIES:
 :CUSTOM_ID: entity-render-map
 :END:
+
+** Entities
 
 I made an Entity class just like in [[https://rogueliketutorials.com/tutorials/tcod/v2/part-2/][the Python tutorial]], but with two changes:
 
 1. I changed =x= and =y= being separate fields to a single Location object ={x, y}=. This is because I want to be able to pass the location around and also have special values like "not on the map" or "in inventory". I will later extend Location to be an enum to hold special values.
 2. I changed =char= and =color= being their own fields to a single Appearance object ={sprite}=. I think the sprite characteristics should not be per-entity, but stored elsewhere. I'll then extend Appearance to have modifiers to override the color, size, etc. per entity.
 
+#+begin_src typescript
+export type Location = {x: number, y: number};
+export type Appearance = {sprite: string};
 
+export class Entity {
+    constructor (public location: Location, public appearance: Appearance) {
+    }
+
+    moveBy(dx: number, dy: number) {
+        this.location = {x: this.location.x + dx,
+                         y: this.location.y + dy};
+    }
+}
+#+end_src
+
+** Engine
+
+As Python and Javascript modules act like objects, I didn't see a strong need to make an =Engine= class just yet. The fields of the Engine in the Python tutorial become module-level variables in my project. If there's a need (either to have multiple instances, or to pass it around to other modules), I'll change it later.
+
+** Map
+
+The [[https://rogueliketutorials.com/tutorials/tcod/v2/part-2/][Python tutorial]] for the map goes into NumPy =dtype= and =ndarray=, but I don't need that in Javascript. I'm also not planning to have FOV in this project, so I don't need the =transparent= and =dark= data. What do I actually need?
+
+1. A =GameMap= will have an array of tiles.
+1. The tile will be static data (the same for every instance of that tile: appearance, properties like walkability, etc.) and varying data (only the tile type right now, but maybe more later like water depth)
+
+So I think for now the =GameMap= can be an array of strings, and the strings will be a index into the static data.
+
+I put in some dummy data for now. Generating the map will be the next section.
 
 * TODO Generating a map
 :PROPERTIES:
