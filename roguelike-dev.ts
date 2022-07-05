@@ -5,9 +5,11 @@
  */
 
 import { print, sprites } from "./ui";
+import { Entity } from "./entity";
+
 print("Hello and welcome, fortress maker!", 'welcome');
 
-const player = {x: 5, y: 7};
+const player = new Entity({x: 5, y: 7}, {sprite: 'person'});
 
 const VIEWWIDTH = 17, VIEWHEIGHT = 17;
 const TILE_SIZE = 32;
@@ -31,12 +33,11 @@ canvas.addEventListener('focus', () => { focusInstructions.classList.remove('vis
 canvas.focus();
 
 // Handle keyboard events
-const gameInstructions = document.querySelector("#game-instructions");
+const gameInstructions = document.querySelector("#game-instructions") as HTMLElement;
 gameInstructions.innerText = "Arrows to move";
 
 function playerMoveBy(dx, dy) {
-    player.x += dx;
-    player.y += dy;
+    player.moveBy(dx, dy);
     redraw();
 }
 
@@ -74,7 +75,7 @@ function redraw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let y = 0; y < 20; y++) {
         for (let x = 0; x < 20; x++) {
-            drawSprite(x, y, x === player.x && y === player.y ? 'person' : 'strawbale');
+            drawSprite(x, y, x === player.location.x && y === player.location.y ? 'person' : 'strawbale');
         }
     }
 }

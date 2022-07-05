@@ -83,6 +83,12 @@ When the canvas has keyboard focus it will get =keydown= events with each key pr
 :CUSTOM_ID: entity-render-map
 :END:
 
+I made an Entity class just like in [[https://rogueliketutorials.com/tutorials/tcod/v2/part-2/][the Python tutorial]], but with two changes:
+
+1. I changed =x= and =y= being separate fields to a single Location object ={x, y}=. This is because I want to be able to pass the location around and also have special values like "not on the map" or "in inventory". I will later extend Location to be an enum to hold special values.
+2. I changed =char= and =color= being their own fields to a single Appearance object ={sprite}=. I think the sprite characteristics should not be per-entity, but stored elsewhere. I'll then extend Appearance to have modifiers to override the color, size, etc. per entity.
+
+
 
 * TODO Generating a map
 :PROPERTIES:
