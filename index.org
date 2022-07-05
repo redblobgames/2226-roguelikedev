@@ -2,21 +2,15 @@
 #+date: <2022-06-28 Tue>
 #+options: toc:nil
 
-Each summer r/roguelikedev has a [[https://old.reddit.com/r/roguelikedev/wiki/python_tutorial_series][summer event]] in which we all make a simple roguelike, roughly following the libtcod roguelike tutorial. I've tried several times and [[href:/x/2025-roguelike-dev/][actually finished in 2020]], using [[https://ondras.github.io/rot.js/hp/][rot.js]] and Javascript. I kept the scope down by implementing only the topics from the tutorial. Then [[href:/x/2126-roguelike-dev/][in 2021]] I implemented topics I wanted to try: thin walls, graphics, animations, openable doors, new map generator. I had many more things I wanted to try but I was too ambitious.
+Each summer r/roguelikedev has a [[https://old.reddit.com/r/roguelikedev/wiki/python_tutorial_series][summer event]] in which we all make a simple roguelike, roughly following the libtcod roguelike tutorial. I've tried several times and [[href:/x/2025-roguelike-dev/][actually finished in 2020]], using [[https://ondras.github.io/rot.js/hp/][rot.js]] and Javascript. I kept the scope down by implementing only the topics from the tutorial. Then [[href:/x/2126-roguelike-dev/][in 2021]] I implemented topics I wanted to try: thin walls, graphics, animations, openable doors, new map generator. I had many more things I wanted to try but I was too ambitious, and didn't finish.
 
-For this year's summer event I'd like to do something more "fortress mode" and less "adventure mode". 
+For this year's summer event I'd like to do something more "fortress mode" and less "adventure mode".  This may prove too ambitious; we shall see.
 
 #+include: "game.html" export html
 
-(Icons from [[https://game-icons.net][game-icons.net]], CC BY 3.0)
+Icons from [[https://game-icons.net][game-icons.net]], CC BY 3.0. Code repository [[https://github.com/redblobgames/2226-roguelikedev][on github]].
 
 #+TOC: headlines 2
-
-1. map generation will be a wilderness map, not a dungeon map
-1. you'll dig and build on the map to make your own settlement
-1. no field of view; you can see everything
-1. scrolling map
-1. there will be friendly npcs
 
 * Setting up
 :PROPERTIES:
@@ -27,7 +21,7 @@ For this year's summer event I'd like to do something more "fortress mode" and l
 
 Compared to a Python project, I feel the set up is simpler in Javascript. I started with =game.html=:
 
-#+begin_src html
+#+begin_src xml
 <canvas id="game" width="660" height="660" />
 <script src="build/_bundle.js"></script>
 #+end_src
@@ -35,7 +29,8 @@ Compared to a Python project, I feel the set up is simpler in Javascript. I star
 If I were using rot.js, there's be one more =<script>= line. This year I'm not using rot.js. I'm using Typescript instead of Javascript. Here's =roguelike-dev.ts=:
 
 #+begin_src typescript
-const canvas = document.querySelector("#game") as HTMLCanvasElement;
+const canvas = document.querySelector("#game") 
+               as HTMLCanvasElement;
 #+end_src
 
 The Typescript file has to be compiled into Javascript before the browser will run it. I've been using [[https://esbuild.github.io/][esbuild]] for that. I really like it. I have lots of small projects and have standardized on having a file called ~./build.sh~ that will build the project:
@@ -60,7 +55,7 @@ For the rest of this project I'm going to /try/ to follow the same section numbe
 :CUSTOM_ID: rendering
 :END:
 
-I'm using <canvas> this year, not <svg>. Conveniently, game-icons icons are all a /single <path>/, and paths can be drawn to a <canvas> using https://developer.mozilla.org/en-US/docs/Web/API/Path2D. To load the icon into memory, I can use esbuild's loaders to make importing an svg work:
+I'm using =<canvas>= this year, not =<svg>=. Conveniently, the game-icons svg icons are all a /single/ =<path>=, and paths can be drawn to a =<canvas>= using [[https://developer.mozilla.org/en-US/docs/Web/API/Path2D][Path2D]]. To load the icon into memory, I can use esbuild's loaders to make importing an svg work:
 
 #+begin_src js
 import person from "./game-icons/delapouite/person.svg";
@@ -72,40 +67,53 @@ esbuild --loader:.svg=text
 
 This will make =person= the contents of the svg file.
 
-But I need to build a mapping from icon + style (color / gradient / outline) to tile type, or I could switch to webgl so that I could do these things in shaders. Probably not worth webgl yet. Keep it simple. One color + shape per object.
+Given a Path2D I can draw using any fill and outline style I want (including gradients, line widths, and shadows). I imported sprites in but I somewhere I need to store what style to draw them in. WebGL would open up more possibilities but I'm trying to follow [[https://wiki.c2.com/?DoTheSimplestThingThatCouldPossiblyWork][DoTheSimplestThingThatCouldPossiblyWork]] so I'm going to stick to regular =<canvas>=.
 
 ** Keyboard
 :PROPERTIES:
 :CUSTOM_ID: keyboard
 :END:
 
-For the keyboard I'm mostly following what I did two years ago: [[href:/x/2025-roguelike-dev/#key-input]]
+For the keyboard I'm mostly following what I did [[href:/x/2025-roguelike-dev/#key-input][two years ago]]. I add a =tabindex= to the =<canvas>= to allow it to receive keyboard focus. When it doesn't have focus, I display a message telling the player to click on the game to give it focus. I think the alternative is to make the entire window's keyboard events go to the game, but I like this approach better because it allows me to use the arrow keys for scrolling the page, or use an =<input>= box that receives keyboard focus.
 
+When the canvas has keyboard focus it will get =keydown= events with each key pressed. I might want to get both =keyup= and =keydown= because I think it might be useful for building to hold down a direction key and then press a letter to build something in that direction. I'll experiment with that when I get to building.
 
 * TODO Entity, render, map
 :PROPERTIES:
 :CUSTOM_ID: entity-render-map
 :END:
 
+
 * TODO Generating a map
 :PROPERTIES:
 :CUSTOM_ID: generating-a-map
 :END:
+
+1. map generation will be a wilderness map, not a dungeon map
+1. you'll dig and build on the map to make your own settlement
 
 * TODO Field of view
 :PROPERTIES:
 :CUSTOM_ID: field-of-view
 :END:
 
+1. no field of view; you can see everything
+1. scrolling map
+
 * TODO Placing enemies
 :PROPERTIES:
 :CUSTOM_ID: placing-enemies
 :END:
 
+1. there will be friendly npcs
+
+
 * TODO Combat
 :PROPERTIES:
 :CUSTOM_ID: combat
 :END:
+
+1. not sure if I'll have combat at all
 
 * TODO Interface
 :PROPERTIES:
@@ -117,34 +125,46 @@ For the keyboard I'm mostly following what I did two years ago: [[href:/x/2025-r
 :CUSTOM_ID: items-and-inventory
 :END:
 
+1. individual inventory, or everything owned by the colony?
+
 * TODO Ranged scrolls and targeting
 :PROPERTIES:
 :CUSTOM_ID: ranged-scrolls-and-targeting
 :END:
+
+1. maybe planting and harvesting instead
 
 * TODO Saving and loading
 :PROPERTIES:
 :CUSTOM_ID: saving-and-loading
 :END:
 
+1. probably will skip
+
 * TODO Dungeon levels
 :PROPERTIES:
 :CUSTOM_ID: dungeon-levels
 :END:
+
+1. not applicable, need to find another topic for this week
 
 * TODO Increasing difficulty
 :PROPERTIES:
 :CUSTOM_ID: increasing-difficulty
 :END:
 
+1. want you to have to learn more systems as you scale up (more people or more advanced tech)
+
 * TODO Gearing up
 :PROPERTIES:
 :CUSTOM_ID: gearing-up
 :END:
 
+1. not applicable, need to find another topic for this week
+
 #+begin_export html
 <x:footer>
   Created 28 Jun 2022; &#160;
-  <!-- hhmts start -->Last modified: 01 Jul 2022<!-- hhmts end -->
+  <!-- hhmts start -->Last modified: 05 Jul 2022<!-- hhmts end -->
 </x:footer>
 #+end_export
