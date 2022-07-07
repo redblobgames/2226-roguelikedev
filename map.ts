@@ -33,13 +33,14 @@ export class GameMap {
     tiles: TileMap = new KeyMap((p: Point) => `${p.x},${p.y}`);
 
     constructor() {
-        for (let r = MAP_BOUNDS.top; r <= MAP_BOUNDS.bottom; r++) {
-            for (let q = MAP_BOUNDS.left; q <= MAP_BOUNDS.right; q++) {
+        const {left, top, right, bottom} = MAP_BOUNDS;
+        for (let r = top; r <= bottom; r++) {
+            for (let q = left; q <= right; q++) {
                 this.tiles.set({x: q, y: r}, 'grass');
             }
         }
-        let q = (MAP_BOUNDS.left + MAP_BOUNDS.right) >> 1;
-        for (let r = MAP_BOUNDS.top; r <= MAP_BOUNDS.bottom; r++) {
+        let q = (left + right) >> 1;
+        for (let r = top; r <= bottom; r++) {
             this.tiles.set({x: q, y: r}, 'river');
             if (Math.random() < 0.3) q--;
             else if (Math.random() < 0.3) q++;

@@ -10,6 +10,9 @@ import { map } from "./map";
 
 print("Hello and welcome, fortress maker!", 'welcome');
 
+function clamp(x: number, lo: number, hi: number): number { return x < lo ? lo : x > hi ? hi : x; }
+let camera = {x: player.location.x, y: player.location.y};
+
 const TILE_SIZE = 24;
 
 const canvas = document.querySelector("#game") as HTMLCanvasElement;
@@ -74,6 +77,13 @@ function drawSprite(x: number, y: number, name: string, color="white") {
 }
 
 function render() {
+    camera.x = clamp(camera.x, player.location.x - 2, player.location.x + 2);
+    camera.y = clamp(camera.y, player.location.y - 2, player.location.y + 2);
+
+    const halfwidth = VIEWWIDTH >> 1;
+    const halfheight = VIEWHEIGHT >> 1;
+    const dx = halfwidth - camera.x;
+    const dy = halfheight - camera.y;
     const unknownRender = ['strawbale', "gray"];
     const tileRenders = {
         grass: ['abstract50', "hsl(100, 30%, 50%)"],
@@ -81,17 +91,19 @@ function render() {
         wall: ['wall', "brown"],
     };
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let y = 0; y < VIEWHEIGHT; y++) {
-        for (let x = 0; x < VIEWWIDTH; x++) {
+    for (let y = camera.y - halfheight; y <= camera.y + halfheight; y++) {
+        for (let x = camera.x - halfwidth; x <= camera.x + halfwidth; x++) {
             if (map.inBounds({x, y})) {
                 let tile = map.tiles.get({x, y});
                 let render = tileRenders[tile] ?? unknownRender;
-                drawSprite(x, y, render[0], render[1]);
+                drawSprite(x + dx, y + dy,
+                           render[0], render[1]);
             }
         }
     }
     for (let entity of entities) {
-        drawSprite(entity.location.x, entity.location.y, entity.appearance.sprite, "yellow");
+        drawSprite(entity.location.x + dx, entity.location.y + dy,
+                   entity.appearance.sprite, "yellow");
     }
 }
 

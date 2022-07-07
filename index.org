@@ -149,7 +149,31 @@ Since I'm making a "fortress style" game, I want the main map to be a /wildernes
 
 I will start by drawing a meandering river through the map, and then define the other elements by how far they are from the river. Will that be a reasonable starting point? We'll see.
 
-Tangent: the same sprite in different colors could mean different things. So far my code loads a /sprite/ but then hard codes the colors. I want a mapping from tile type to sprite+color.
+Tangent: the same sprite in different colors could mean different things. So far my code loads a /sprite/ but then hard codes the colors. I'll need a mapping from tile type to sprite+color.
+
+** Scrolling
+:PROPERTIES:
+:CUSTOM_ID: map-scrolling
+:END:
+
+I also need to make the map a bit bigger to have room for both wilderness and building. Since the map will be bigger than what's on the screen, I need to have scrolling. Normally in a "fortress style" game you'd scroll with the mouse or with dragging, but since I still have a player character walking around, I made it scroll with the player character. To center the view on the player, wherever I'm drawing to the window with:
+
+#+begin_src js
+display.draw(x, y, ch, color);
+#+end_src
+
+I need to instead /offset/ that position:
+
+#+begin_src js
+display.draw(x - player.x + WINDOW_WIDTH/2, 
+             y - player.y + WINDOW_HEIGHT/2, 
+             ch, color);
+#+end_src
+
+The way to think of this is in two steps:
+
+1. Subtracting the player position moves the player to 0,0
+2. Adding the width/2, height/2 moves from 0,0 to the center of the screen
 
 * TODO Field of view
 :PROPERTIES:
