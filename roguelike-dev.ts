@@ -87,6 +87,8 @@ function render() {
     const unknownRender = ['strawbale', "gray"];
     const tileRenders = {
         grass: ['abstract50', "hsl(100, 30%, 50%)"],
+        desert: ['abstract50', "hsl(50, 20%, 70%)"],
+        mountain: ['abstract50', "hsl(30, 10%, 80%)"],
         river: ['abstract50', "hsl(250, 50%, 30%)"],
         wall: ['wall', "brown"],
     };

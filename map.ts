@@ -33,17 +33,35 @@ export class GameMap {
     tiles: TileMap = new KeyMap((p: Point) => `${p.x},${p.y}`);
 
     constructor() {
+        function tweakNumber(n: number, halfprob=0.3): number {
+            if (Math.random() < halfprob) return n-1;
+            if (Math.random() < halfprob) return n+1;
+            return n;
+        }
+        
         const {left, top, right, bottom} = MAP_BOUNDS;
         for (let r = top; r <= bottom; r++) {
             for (let q = left; q <= right; q++) {
                 this.tiles.set({x: q, y: r}, 'grass');
             }
         }
-        let q = (left + right) >> 1;
+        let riverQ = (left + right) >> 1;
+        let desertLeftWidth = 10;
+        let desertRightWidth = 10;
         for (let r = top; r <= bottom; r++) {
-            this.tiles.set({x: q, y: r}, 'river');
-            if (Math.random() < 0.3) q--;
-            else if (Math.random() < 0.3) q++;
+            riverQ = tweakNumber(riverQ);
+            desertLeftWidth = tweakNumber(desertLeftWidth);
+            desertRightWidth = tweakNumber(desertRightWidth);
+            
+            for (let q = left; q <= right; q++) {
+                let tileType =
+                    q >= riverQ && q < riverQ+2 ? 'river'
+                    : q < riverQ - desertLeftWidth ? 'desert'
+                    : q < riverQ ? 'grass'
+                    : q < riverQ + desertRightWidth ? 'grass'
+                    : 'desert';
+                this.tiles.set({x: q, y: r}, tileType);
+            }
         }
     }
     
