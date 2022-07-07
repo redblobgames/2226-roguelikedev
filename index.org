@@ -165,8 +165,8 @@ display.draw(x, y, ch, color);
 I need to instead /offset/ that position:
 
 #+begin_src js
-display.draw(x - player.x + WINDOW_WIDTH/2, 
-             y - player.y + WINDOW_HEIGHT/2, 
+display.draw(x - player.location.x + WINDOW_WIDTH/2, 
+             y - player.location.y + WINDOW_HEIGHT/2, 
              ch, color);
 #+end_src
 
@@ -174,6 +174,64 @@ The way to think of this is in two steps:
 
 1. Subtracting the player position moves the player to 0,0
 2. Adding the width/2, height/2 moves from 0,0 to the center of the screen
+
+A bonus would be to have a /camera/ that's separate from the /player/. Let's do that:
+
+#+begin_src js
+let camera = {x: player.location.x, y: player.location.y};
+
+…
+camera.x = player.location.x;
+camera.y = player.location.y;
+…
+display.draw(x - camera.x + WINDOW_WIDTH/2, 
+             y - camera.y + WINDOW_HEIGHT/2, 
+             ch, color);
+#+end_src
+
+Ok, it's a separate object now but it's always pointed at the player. Let's change it so that it follows the player but can be behind by 2 tiles:
+
+#+begin_src js
+camera.x = clamp(camera.x, 
+                 player.location.x - 2, 
+                 player.location.x + 2);
+camera.y = clamp(camera.y, 
+                 player.location.y - 2, 
+                 player.location.y + 2);
+#+end_src
+
+We can also make it stop scrolling before reaching the end of the map:
+
+#+begin_src js
+const halfwidth = VIEWWIDTH >> 1;
+const halfheight = VIEWHEIGHT >> 1;
+camera.x = clamp(camera.x,
+                 map.bounds.left + halfwidth,
+                 map.bounds.right - halfwidth+ 1);
+camera.y = clamp(camera.y,
+                 map.bounds.top + halfheight,
+                 map.bounds.bottom - halfheight + 1);
+#+end_src
+
+I think there are more fun things that I could do but I'll leave that for later.
+
+** Building
+:PROPERTIES:
+:CUSTOM_ID: map-building
+:END:
+
+The generated map is only the wilderness. In this game the player will be building the rooms. I need to figure out the UI for that. If I had a /facing/ direction then the player could build in front of themselves. But the keystrokes for that are annoying. If you want to build a wall on tiles 1, 2, 3:
+
+#+begin_example
+  1  2  3
+  4  5  6
+#+end_example
+
+You have to move to 4, press ~Up~ to face towards 1, press ~E~ to build, then press ~Right~ to face right, then press ~Right~ to move right, then press ~Up~ to face towards towards 2, press ~E~ to build, etc.
+
+I also considered having the player /pick up/ building materials and then place them for building, but I think that's even more awkward.
+
+So maybe I shouldn't have the player move around while building. What if a build key ~B~ starts build mode, and then you can move the cursor around freely? Then pressing ~B~ again goes back to the player. This would be /placing orders/ that your ally NPCs would actually build. I might try this, but I'll need NPCs to make it work.
 
 * TODO Field of view
 :PROPERTIES:

@@ -13,11 +13,12 @@ print("Hello and welcome, fortress maker!", 'welcome');
 function clamp(x: number, lo: number, hi: number): number { return x < lo ? lo : x > hi ? hi : x; }
 let camera = {x: player.location.x, y: player.location.y};
 
-const TILE_SIZE = 24;
 
 const canvas = document.querySelector("#game") as HTMLCanvasElement;
-const VIEWWIDTH = Math.ceil(canvas.width / TILE_SIZE);
-const VIEWHEIGHT = Math.ceil(canvas.height / TILE_SIZE);
+const TILE_SIZE = 22;
+const VIEWWIDTH = canvas.width / TILE_SIZE;
+const VIEWHEIGHT = canvas.height / TILE_SIZE;
+if (VIEWWIDTH % 1.0 !== 0.0 || VIEWHEIGHT % 1.0 !== 0.0) assert("Tile size mismatch");
 const ctx = canvas.getContext('2d');
 
 // Handle hi-dpi displays
@@ -77,11 +78,15 @@ function drawSprite(x: number, y: number, name: string, color="white") {
 }
 
 function render() {
-    camera.x = clamp(camera.x, player.location.x - 2, player.location.x + 2);
-    camera.y = clamp(camera.y, player.location.y - 2, player.location.y + 2);
+    const viewWindow = 0;
+    camera.x = clamp(camera.x, player.location.x - viewWindow, player.location.x + viewWindow);
+    camera.y = clamp(camera.y, player.location.y - viewWindow, player.location.y + viewWindow);
 
     const halfwidth = VIEWWIDTH >> 1;
     const halfheight = VIEWHEIGHT >> 1;
+    camera.x = clamp(camera.x, map.bounds.left + halfwidth, map.bounds.right - halfwidth + 1);
+    camera.y = clamp(camera.y, map.bounds.top + halfheight, map.bounds.bottom - halfheight + 1);
+
     const dx = halfwidth - camera.x;
     const dy = halfheight - camera.y;
     const unknownRender = ['strawbale', "gray"];

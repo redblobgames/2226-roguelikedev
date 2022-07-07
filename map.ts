@@ -9,8 +9,8 @@ export type Point = {x: number, y: number};
 const MAP_BOUNDS = {
     left: 0,
     top: 0,
-    right: 30,
-    bottom: 20,
+    right: 40,
+    bottom: 30,
 };
 
 // Javascript Map only takes string keys, but I want to take other types
@@ -30,6 +30,7 @@ type TileType = 'wall' | 'grass' | 'river' | 'desert' | 'mountain';
 type TileMap = KeyMap<Point, TileType>;
 
 export class GameMap {
+    bounds = MAP_BOUNDS;
     tiles: TileMap = new KeyMap((p: Point) => `${p.x},${p.y}`);
 
     constructor() {
@@ -39,7 +40,7 @@ export class GameMap {
             return n;
         }
         
-        const {left, top, right, bottom} = MAP_BOUNDS;
+        const {left, top, right, bottom} = this.bounds;
         for (let r = top; r <= bottom; r++) {
             for (let q = left; q <= right; q++) {
                 this.tiles.set({x: q, y: r}, 'grass');
@@ -66,7 +67,7 @@ export class GameMap {
     }
     
     inBounds(p: Point) {
-        const {left, top, right, bottom} = MAP_BOUNDS;
+        const {left, top, right, bottom} = this.bounds;
         return left <= p.x && p.x <= right
             && top <= p.y && p.y <= bottom;
     }
