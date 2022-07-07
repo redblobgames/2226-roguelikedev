@@ -47,7 +47,7 @@ For the rest of this project I'm going to /try/ to follow the same section numbe
 
 * Moving around
 :PROPERTIES:
-:CUSTOM_ID: moving-around
+:CUSTOM_ID: section-1
 :END:
 
 ** Rendering
@@ -80,7 +80,7 @@ When the canvas has keyboard focus it will get =keydown= events with each key pr
 
 * Entity, render, map
 :PROPERTIES:
-:CUSTOM_ID: entity-render-map
+:CUSTOM_ID: section-2
 :END:
 
 ** Entities
@@ -98,7 +98,8 @@ export type Location = {x: number, y: number};
 export type Appearance = {sprite: string};
 
 export class Entity {
-    constructor (public location: Location, public appearance: Appearance) {
+    constructor (public location: Location, 
+                 public appearance: Appearance) {
     }
 
     moveBy(dx: number, dy: number) {
@@ -117,7 +118,7 @@ As Python and Javascript modules act like objects, I didn't see a strong need to
 
 ** Map
 :PROPERTIES:
-:CUSTOM_ID: map
+:CUSTOM_ID: map-storage
 :END:
 
 The [[https://rogueliketutorials.com/tutorials/tcod/v2/part-2/][Python tutorial]] for the map goes into NumPy =dtype= and =ndarray=, but I don't need that in Javascript. I'm also not planning to have FOV in this project, so I don't need the =transparent= and =dark= data. What do I actually need?
@@ -134,6 +135,11 @@ I put in some dummy data for now. Generating the map will be the next section.
 :CUSTOM_ID: generating-a-map
 :END:
 
+** Generation
+:PROPERTIES:
+:CUSTOM_ID: map-generation
+:END:
+
 Since I'm making a "fortress style" game, I want the main map to be a /wilderness/ map with resources that you can use to /build/ your own settlement. What terrain do I want to start with?
 
 1. one river going through the map
@@ -147,7 +153,7 @@ Tangent: the same sprite in different colors could mean different things. So far
 
 * TODO Field of view
 :PROPERTIES:
-:CUSTOM_ID: field-of-view
+:CUSTOM_ID: section-4
 :END:
 
 1. no field of view; you can see everything
@@ -155,7 +161,7 @@ Tangent: the same sprite in different colors could mean different things. So far
 
 * TODO Placing enemies
 :PROPERTIES:
-:CUSTOM_ID: placing-enemies
+:CUSTOM_ID: section-5
 :END:
 
 1. there will be friendly npcs
@@ -163,61 +169,63 @@ Tangent: the same sprite in different colors could mean different things. So far
 
 * TODO Combat
 :PROPERTIES:
-:CUSTOM_ID: combat
+:CUSTOM_ID: section-6
 :END:
 
 1. not sure if I'll have combat at all
 
 * TODO Interface
 :PROPERTIES:
-:CUSTOM_ID: interface
+:CUSTOM_ID: section-7
 :END:
 
 * TODO Items and inventory
 :PROPERTIES:
-:CUSTOM_ID: items-and-inventory
+:CUSTOM_ID: section-8
 :END:
 
 1. individual inventory, or everything owned by the colony?
 
 * TODO Ranged scrolls and targeting
 :PROPERTIES:
-:CUSTOM_ID: ranged-scrolls-and-targeting
+:CUSTOM_ID: section-9
 :END:
 
 1. maybe planting and harvesting instead
 
 * TODO Saving and loading
 :PROPERTIES:
-:CUSTOM_ID: saving-and-loading
+:CUSTOM_ID: section-10
 :END:
 
 1. probably will skip
 
 * TODO Dungeon levels
 :PROPERTIES:
-:CUSTOM_ID: dungeon-levels
+:CUSTOM_ID: section-11
 :END:
 
 1. not applicable, need to find another topic for this week
 
 * TODO Increasing difficulty
 :PROPERTIES:
-:CUSTOM_ID: increasing-difficulty
+:CUSTOM_ID: section-12
 :END:
 
 1. want you to have to learn more systems as you scale up (more people or more advanced tech)
 
 * TODO Gearing up
 :PROPERTIES:
-:CUSTOM_ID: gearing-up
+:CUSTOM_ID: section-13
 :END:
 
 1. not applicable, need to find another topic for this week
 
+* TODO Conclusion
+
 #+begin_export html
 <x:footer>
   Created 28 Jun 2022; &#160;
-  <!-- hhmts start -->Last modified: 05 Jul 2022<!-- hhmts end -->
+  <!-- hhmts start -->Last modified: 06 Jul 2022<!-- hhmts end -->
 </x:footer>
 #+end_export
