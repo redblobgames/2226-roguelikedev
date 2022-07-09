@@ -4,8 +4,6 @@
  * License: Apache-2.0 <http://www.apache.org/licenses/LICENSE-2.0.html>
  */
 
-import { print } from "./ui";
-import { setInputMode }  from "./input";
-
-print("Hello and welcome, fortress maker!", 'welcome');
-setInputMode('move');
+export function clamp(x: number, lo: number, hi: number): number {
+    return x < lo ? lo : x > hi ? hi : x;
+}
