@@ -87,6 +87,10 @@ export function render() {
             let tile = map.tiles.get({x, y});
             let render = tileRenders[tile] ?? "red";
             drawSprite(x + dx, y + dy, null, render);
+            let object = map.objects.get({x, y});
+            if (object) {
+                drawSprite(x + dx, y + dy, object, "white"); // TODO: need to figure out colors, sizes
+            }
         }
     }
     for (let entity of entities) {

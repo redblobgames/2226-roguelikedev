@@ -260,6 +260,11 @@ In addition to the /floor/ types (grass, desert, water) I also want to place obj
 :CUSTOM_ID: map-building
 :END:
 
+*** UI
+:PROPERTIES:
+:CUSTOM_ID: building-ui
+:END:
+
 The generated map is only the wilderness. In this game the player will be building the rooms. I need to figure out the UI for that. If I had a /facing/ direction then the player could build in front of themselves. My first idea was to have you /pick up/ building materials and then /place/ them for building. But the keystrokes for that are annoying. If you want to build a wall on tiles 1, 2, 3:
 
 #+begin_example
@@ -293,6 +298,47 @@ Stepping back a bit, I had been starting from the "adventure mode" style movemen
 I think this means I can't use the [[https://simblob.blogspot.com/2019/10/verb-noun-vs-noun-verb.html][noun-verb approach]] I wanted to try last year. Traditional roguelikes use verb-noun, where you choose the action first and then you choose the object. You might choose throw, and then choose from a list of throwable items. With noun-verb you first select an object and then you pick the action to apply. You might first choose a potion and then the action could be throw or drink. Modern games, modern programming languages, and modern UIs typically use noun-verb. For example in a text editor, you first select some text and then you pick an action like cut. Since I want a different UI depending on which verb is used, I think I have to use verb-noun instead of noun-verb.
 
 Other thoughts: Should I switch to the mouse? Dragging a line or rectangle probably makes more sense with a mouse. But I want to see how far I can get with the keyboard. I should also take another look at [[https://dwarffortresswiki.org/index.php/DF2014:Controls][Dwarf Fortress keys]].
+
+*** Implementation
+:PROPERTIES:
+:CUSTOM_ID: building-implementation
+:END:
+
+I refactored the code a little bit, moving keyboard handling into its own module. It's starting to have a bit to deal with:
+
+- check if the canvas if focused, display message when it is not
+- key down handler
+- different handlers in regular mode and wall-building mode
+
+And I want it to do more:
+
+- key up handler, keyboard repeat
+- stockpile and other building modes
+- don't handle keys if the game isn't visible on screen
+
+For the different modes, I created a /key map/ object:
+
+#+begin_src js
+actions = {
+    ArrowRight() { playerMoveBy(+1, 0); },
+    ArrowLeft()  { playerMoveBy(-1, 0); },
+    ArrowDown()  { playerMoveBy(0, +1); },
+    ArrowUp()    { playerMoveBy(0, -1); },
+};
+#+end_src
+
+In Javascript, ~{ … }~ works both as a map (Python dict) and an object. When a key ='ArrowRight'=  comes in, I can call ~actions[event.key]()~ to run the corresponding action. When I switch to wall-building mode, I'll assign a different key map to =actions=.
+
+There's some duplicate code in there to handle the arrow keys for each of the building modes, but I'll clean that up later once I have something that works.
+
+#+begin_export html
+<figure>
+  <img src="screenshots/section-3c-walls.png" />
+  <figcaption>Wall building</figcaption>
+</figure>
+#+end_export
+
+I implemented the beginnings of wall building but the UI is pretty rough. I need a way to /preview/ the walls that are going to be put down. That means =actions= isn't sufficient. I need to maintain state, and also hook into the rendering. Hm.
 
 * TODO Field of view
 :PROPERTIES:

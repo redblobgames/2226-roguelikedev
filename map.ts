@@ -28,10 +28,13 @@ class KeyMap<T, U> extends Map {
 
 type TileType = 'grass' | 'river' | 'desert' | 'mountain';
 type TileMap = KeyMap<Point, TileType>;
+type ObjectType = 'tree' | 'wall';
+type ObjectMap = KeyMap<Point, ObjectType>;
 
 export class GameMap {
     bounds = MAP_BOUNDS;
     tiles: TileMap = new KeyMap((p: Point) => `${p.x},${p.y}`);
+    objects: ObjectMap = new KeyMap((p: Point) => `${p.x},${p.y}`);
 
     constructor() {
         function tweakNumber(n: number, halfprob=0.3): number {

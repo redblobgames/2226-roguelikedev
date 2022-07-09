@@ -5,7 +5,7 @@
  */
 
 import { canvas, render } from "./ui";
-import { map } from "./map";
+import { Point, map } from "./map";
 import { player } from "./simulation";
 
 // Handle keyboard focus
@@ -29,25 +29,47 @@ export function setInputMode(inputMode: InputMode) {
             gameInstructions.innerHTML = "Arrows to move; <kbd>W</kbd> to build walls";
             actions = {
                 ArrowRight() { playerMoveBy(+1, 0); },
-                ArrowLeft() { playerMoveBy(-1, 0); },
-                ArrowDown() { playerMoveBy(0, +1); },
-                ArrowUp()  { playerMoveBy(0, -1); },
-                PageUp() { playerMoveBy(+1, -1); },
-                PageDown() { playerMoveBy(+1, +1); },
-                Home() { playerMoveBy(-1, -1); },
-                End() { playerMoveBy(-1, +1); },
-                w() { setInputMode('wall'); },
-                // TODO: add numpad keys, test "0" through "9" with location != 0
+                ArrowLeft()  { playerMoveBy(-1, 0); },
+                ArrowDown()  { playerMoveBy(0, +1); },
+                ArrowUp()    { playerMoveBy(0, -1); },
+                PageUp()     { playerMoveBy(+1, -1); },
+                PageDown()   { playerMoveBy(+1, +1); },
+                Home()       { playerMoveBy(-1, -1); },
+                End()        { playerMoveBy(-1, +1); },
+                w()          { setInputMode('wall'); },
             };
             break;
         case 'wall':
             gameInstructions.innerHTML = "Arrows to build wall; <kbd>Enter</kbd> to save; <kbd>Esc</kbd> to cancel";
+            // TODO: store previous location so we can jump back on Esc
+            // let {x, y} = player.location;
+            let path: Point[] = [];
+            function draw(dx, dy) {
+                player.location.x += dx;
+                player.location.y += dy;
+                path.push({x: player.location.x, y: player.location.y});
+                // TODO: reversing over path should pop
+                // TODO: need to draw current path
+                render();
+            }
+            draw(0, 0);
             actions = {
-                Esc() { setInputMode('move'); },
-                Enter() { setInputMode('move'); },
+                // TODO: share cursor movement code with other building modes
+                ArrowRight() { draw(+1, 0); },
+                ArrowLeft()  { draw(-1, 0); },
+                ArrowDown()  { draw(0, +1); },
+                ArrowUp()    { draw(0, -1); },
+                Escape()     { setInputMode('move'); },
+                Enter()      {
+                    for (let p of path) {
+                        map.objects.set(p, 'wall');
+                    }
+                    setInputMode('move');
+                },
             };
             break;
     }
+    render();
 }
 
 
