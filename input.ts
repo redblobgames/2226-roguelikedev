@@ -60,17 +60,35 @@ function playerMoveBy(dx: number, dy: number) {
     }
 }
 
+// Translate numpad into movement keys
+const NUMPAD_TO_ARROW = {
+    1: 'End',
+    2: 'DownArrow',
+    3: 'PageDown',
+    4: 'LeftArrow',
+    6: 'RightArrow',
+    7: 'Home',
+    8: 'UpArrow',
+    9: 'PageUp',
+};
+
 function handleKeyDown(event: KeyboardEvent) {
     // console.log("Action %s location=%s repeat=%s", event.key, event.location, event.repeat);
     if (event.altKey || event.ctrlKey || event.metaKey) return;
-    if (actions[event.key]) {
+
+    let key = event.key;
+    if (event.location === KeyboardEvent.DOM_KEY_LOCATION_NUMPAD) {
+        key = NUMPAD_TO_ARROW[key] ?? key;
+    }
+
+    if (actions[key]) {
         event.preventDefault();
         if (!event.repeat) {
             // TODO: handle keyboard repeat internally, not through keydown events;
             // this will require storing which keys are up/down and setting up a timer,
             // but I need a timer anyway for the real-time simulation
             // TODO: keyboard handling should be edge based not purely level based, tricky
-            actions[event.key]();
+            actions[key]();
         }
     }
         
