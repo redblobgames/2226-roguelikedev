@@ -14,10 +14,10 @@ function clamp(x: number, lo: number, hi: number): number { return x < lo ? lo :
 
 
 const canvas = document.querySelector("#game") as HTMLCanvasElement;
-const TILE_SIZE = 22;
+const TILE_SIZE = 25;
 const VIEWWIDTH = canvas.width / TILE_SIZE;
 const VIEWHEIGHT = canvas.height / TILE_SIZE;
-if (VIEWWIDTH % 1.0 !== 0.0 || VIEWHEIGHT % 1.0 !== 0.0) assert("Tile size mismatch");
+// if (VIEWWIDTH % 1.0 !== 0.0 || VIEWHEIGHT % 1.0 !== 0.0) assert("Tile size mismatch");
 const ctx = canvas.getContext('2d');
 
 // Handle hi-dpi displays
@@ -94,14 +94,13 @@ function drawSprite(x: number, y: number, name: string | null, color="white") {
 }
 
 function render() {
-    const viewWindow = 0;
-    camera.x = clamp(camera.x, player.location.x - viewWindow, player.location.x + viewWindow);
-    camera.y = clamp(camera.y, player.location.y - viewWindow, player.location.y + viewWindow);
-
-    const halfwidth = VIEWWIDTH >> 1;
-    const halfheight = VIEWHEIGHT >> 1;
-    camera.x = clamp(camera.x, map.bounds.left + halfwidth, map.bounds.right - halfwidth + 1);
-    camera.y = clamp(camera.y, map.bounds.top + halfheight, map.bounds.bottom - halfheight + 1);
+    // TODO: might be simpler to calculate top left? but also want to handle zoom
+    const halfwidth = VIEWWIDTH / 2;
+    const halfheight = VIEWHEIGHT / 2;
+    let camera = {
+        x: clamp(player.location.x, map.bounds.left + halfwidth, map.bounds.right - halfwidth + 1),
+        y: clamp(player.location.y, map.bounds.top + halfheight, map.bounds.bottom - halfheight + 1),
+    };
 
     const dx = halfwidth - camera.x;
     const dy = halfheight - camera.y;
@@ -112,13 +111,11 @@ function render() {
         river: "hsl(250, 50%, 30%)",
     };
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let y = camera.y - halfheight; y <= camera.y + halfheight; y++) {
-        for (let x = camera.x - halfwidth; x <= camera.x + halfwidth; x++) {
-            if (map.inBounds({x, y})) {
-                let tile = map.tiles.get({x, y});
-                let render = tileRenders[tile] ?? "red";
-                drawSprite(x + dx, y + dy, null, render);
-            }
+    for (let y = Math.floor(camera.y - halfheight); y <= Math.ceil(camera.y + halfheight); y++) {
+        for (let x = Math.floor(camera.x - halfwidth); x <= Math.ceil(camera.x + halfwidth); x++) {
+            let tile = map.tiles.get({x, y});
+            let render = tileRenders[tile] ?? "red";
+            drawSprite(x + dx, y + dy, null, render);
         }
     }
     for (let entity of entities) {
