@@ -98,8 +98,12 @@ function render() {
     const halfwidth = VIEWWIDTH / 2;
     const halfheight = VIEWHEIGHT / 2;
     let camera = {
-        x: clamp(player.location.x, map.bounds.left + halfwidth, map.bounds.right - halfwidth + 1),
-        y: clamp(player.location.y, map.bounds.top + halfheight, map.bounds.bottom - halfheight + 1),
+        x: clamp(player.location.x + 0.5,
+                 map.bounds.left + halfwidth,
+                 map.bounds.right - halfwidth + 1),
+        y: clamp(player.location.y + 0.5,
+                 map.bounds.top + halfheight,
+                 map.bounds.bottom - halfheight + 1),
     };
 
     const dx = halfwidth - camera.x;
