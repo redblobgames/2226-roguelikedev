@@ -11,7 +11,6 @@ import { map } from "./map";
 print("Hello and welcome, fortress maker!", 'welcome');
 
 function clamp(x: number, lo: number, hi: number): number { return x < lo ? lo : x > hi ? hi : x; }
-let camera = {x: player.location.x, y: player.location.y};
 
 
 const canvas = document.querySelector("#game") as HTMLCanvasElement;
@@ -48,17 +47,33 @@ function playerMoveBy(dx: number, dy: number) {
 }
 
 function handleKeyDown(event: KeyboardEvent) {
+    // console.log("Action %s location=%s repeat=%s", event.key, event.location, event.repeat);
     if (event.altKey || event.ctrlKey || event.metaKey) return;
     let actions = {
         ArrowRight() { playerMoveBy(+1, 0); },
         ArrowLeft() { playerMoveBy(-1, 0); },
         ArrowDown() { playerMoveBy(0, +1); },
         ArrowUp()  { playerMoveBy(0, -1); },
+        PageUp() { playerMoveBy(+1, -1); },
+        PageDown() { playerMoveBy(+1, +1); },
+        Home() { playerMoveBy(-1, -1); },
+        End() { playerMoveBy(-1, +1); },
+        // TODO: add numpad keys, test "0" through "9" with location != 0
     };
     if (actions[event.key]) {
         event.preventDefault();
-        actions[event.key]();
+        if (!event.repeat) {
+            // TODO: handle keyboard repeat internally, not through keydown events;
+            // this will require storing which keys are up/down and setting up a timer,
+            // but I need a timer anyway for the real-time simulation
+            // TODO: keyboard handling should be edge based not purely level based, tricky
+            actions[event.key]();
+        }
     }
+        
+    // TODO: different building modes
+    // TODO:  maybe Esc to cancel building walls/stockpiles and Enter to confirm
+    // TODO: use intersection observer; stop taking keys when canvas is out of view
 }
 
 
@@ -110,6 +125,8 @@ function render() {
         drawSprite(entity.location.x + dx, entity.location.y + dy,
                    entity.appearance.sprite, "yellow");
     }
+    drawSprite(player.location.x + dx, player.location.y + dy,
+               player.appearance.sprite, "yellow");
 }
 
 render();

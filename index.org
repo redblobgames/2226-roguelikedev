@@ -290,7 +290,9 @@ It'd be simpler if you could directly go into wall-building mode by pressing ~W~
 
 Stepping back a bit, I had been starting from the "adventure mode" style movement for your player character, but I have to admit, I haven't come up with any ideas for what you'd actually /do/ in player mode. So maybe I should drop player mode, and treat build mode as the normal mode. Then you'd press the verb (~W~ for walls, ~S~ for stockpiles, ~D~ for doors, etc.) which would take you into a specialized mode for creating that type of object, and then you'd return to the main mode to move around.
 
-{ Maybe ~Esc~ to cancel building walls/stockpiles and ~W~ / ~S~ / etc. to confirm building, or maybe ~Enter~ to confirm }
+I think this means I can't use the [[https://simblob.blogspot.com/2019/10/verb-noun-vs-noun-verb.html][noun-verb approach]] I wanted to try last year. Traditional roguelikes use verb-noun, where you choose the action first and then you choose the object. You might choose throw, and then choose from a list of throwable items. With noun-verb you first select an object and then you pick the action to apply. You might first choose a potion and then the action could be throw or drink. Modern games, modern programming languages, and modern UIs typically use noun-verb. For example in a text editor, you first select some text and then you pick an action like cut. Since I want a different UI depending on which verb is used, I think I have to use verb-noun instead of noun-verb.
+
+Other thoughts: Should I switch to the mouse? Dragging a line or rectangle probably makes more sense with a mouse. But I want to see how far I can get with the keyboard. I should also take another look at [[https://dwarffortresswiki.org/index.php/DF2014:Controls][Dwarf Fortress keys]].
 
 * TODO Field of view
 :PROPERTIES:

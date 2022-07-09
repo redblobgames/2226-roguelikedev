@@ -19,8 +19,7 @@ export const sprites = {
     wheat:      S(require("./game-icons/lorc/wheat.svg")),
     wall:       S(require("./game-icons/delapouite/stone-wall.svg")),
     door:       S(require("./game-icons/delapouite/door.svg")),
-    strawbale:  S(require("./game-icons/delapouite/round-straw-bale.svg")),
-    abstract50: S(require("./game-icons/viscious-speed/abstract-050.svg")),
+    move:       S(require("./game-icons/delapouite/move.svg")),
 };
 
 
