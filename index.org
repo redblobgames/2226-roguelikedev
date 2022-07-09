@@ -135,9 +135,9 @@ I put in some dummy data for now. Generating the map will be the next section.
 :CUSTOM_ID: generating-a-map
 :END:
 
-** Generation
+** Terrain generation
 :PROPERTIES:
-:CUSTOM_ID: map-generation
+:CUSTOM_ID: map-terrain-generation
 :END:
 
 Since I'm making a "fortress style" game, I want the main map to be a /wilderness/ map with resources that you can use to /build/ your own settlement. What terrain do I want to start with?
@@ -215,7 +215,14 @@ camera.y = clamp(camera.y,
 
 I think there are more fun things that I could do but I'll leave that for later.
 
-** Building
+** TODO Resource placement
+:PROPERTIES:
+:CUSTOM_ID: map-resources
+:END:
+
+In addition to the /floor/ types (grass, desert, water) I also want to place objects on top: trees, stones, berries, gems.
+
+** TODO Building
 :PROPERTIES:
 :CUSTOM_ID: map-building
 :END:
@@ -231,7 +238,7 @@ You have to move to 4, press ~Up~ to face towards 1, press ~E~ to build, then pr
 
 I also considered having the player /pick up/ building materials and then place them for building, but I think that's even more awkward.
 
-So maybe I shouldn't have the player move around while building. What if a build key ~B~ starts build mode, and then you can move the cursor around freely? Then pressing ~B~ again goes back to the player. This would be /placing orders/ that your ally NPCs would actually build. I might try this, but I'll need NPCs to make it work.
+So maybe I shouldn't have the player move around while building. What if a build key ~B~ starts build mode (like vim's insert vs normal mode), and then you can move the cursor around freely to build things? Then pressing ~B~ again goes back to the player. This would be /placing orders/ that your ally NPCs would actually build. For now I can have it build immediately without waiting for NPCs, and then change it once I add NPCs.
 
 * TODO Field of view
 :PROPERTIES:
@@ -308,6 +315,6 @@ So maybe I shouldn't have the player move around while building. What if a build
 #+begin_export html
 <x:footer>
   Created 28 Jun 2022; &#160;
-  <!-- hhmts start -->Last modified: 06 Jul 2022<!-- hhmts end -->
+  <!-- hhmts start -->Last modified: 08 Jul 2022<!-- hhmts end -->
 </x:footer>
 #+end_export

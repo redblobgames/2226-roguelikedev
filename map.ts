@@ -9,8 +9,8 @@ export type Point = {x: number, y: number};
 const MAP_BOUNDS = {
     left: 0,
     top: 0,
-    right: 40,
-    bottom: 30,
+    right: 80,
+    bottom: 50,
 };
 
 // Javascript Map only takes string keys, but I want to take other types
@@ -26,7 +26,7 @@ class KeyMap<T, U> extends Map {
     delete(key: T)        { return super.delete(this.toStr(key)); }
 }
 
-type TileType = 'wall' | 'grass' | 'river' | 'desert' | 'mountain';
+type TileType = 'grass' | 'river' | 'desert' | 'mountain';
 type TileMap = KeyMap<Point, TileType>;
 
 export class GameMap {
@@ -46,21 +46,21 @@ export class GameMap {
                 this.tiles.set({x: q, y: r}, 'grass');
             }
         }
-        let riverQ = (left + right) >> 1;
-        let desertLeftWidth = 10;
-        let desertRightWidth = 10;
+        let riverQ = 10;
+        let desertStart = 20;
+        let desertWidth = 10;
         for (let r = top; r <= bottom; r++) {
-            riverQ = tweakNumber(riverQ);
-            desertLeftWidth = tweakNumber(desertLeftWidth);
-            desertRightWidth = tweakNumber(desertRightWidth);
+            riverQ = Math.max(3, tweakNumber(riverQ));
+            desertStart = Math.max(5, tweakNumber(desertStart));
+            desertWidth = Math.max(3, tweakNumber(desertWidth));
             
             for (let q = left; q <= right; q++) {
-                let tileType =
-                    q >= riverQ && q < riverQ+2 ? 'river'
-                    : q < riverQ - desertLeftWidth ? 'desert'
-                    : q < riverQ ? 'grass'
-                    : q < riverQ + desertRightWidth ? 'grass'
-                    : 'desert';
+                let tileType: TileType =
+                    q < riverQ ? 'grass'
+                    : q < riverQ+2 ? 'river'
+                    : q < riverQ + desertStart ? 'grass'
+                    : q < riverQ + desertStart + desertWidth ? 'desert'
+                    : 'mountain';
                 this.tiles.set({x: q, y: r}, tileType);
             }
         }
