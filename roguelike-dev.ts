@@ -64,16 +64,17 @@ function handleKeyDown(event: KeyboardEvent) {
 
 // Rendering
 
-function drawSprite(x: number, y: number, name: string, color="white") {
+const defaultPath = new Path2D("M 0,0 l 512,0 l 0,512 l -512,0 z");
+function drawSprite(x: number, y: number, name: string | null, color="white") {
     ctx.save();
     ctx.translate(TILE_SIZE * x, TILE_SIZE * y);
     ctx.scale(TILE_SIZE/512, TILE_SIZE/512);
     ctx.lineJoin = 'bevel'; // some of the game-icons have sharp corners
     ctx.lineWidth = 2/(TILE_SIZE/512);
     ctx.strokeStyle = "black";
-    ctx.stroke(sprites[name]);
+    ctx.stroke(sprites[name] ?? defaultPath);
     ctx.fillStyle = color;
-    ctx.fill(sprites[name]);
+    ctx.fill(sprites[name] ?? defaultPath);
     ctx.restore();
 }
 
@@ -89,22 +90,19 @@ function render() {
 
     const dx = halfwidth - camera.x;
     const dy = halfheight - camera.y;
-    const unknownRender = ['strawbale', "gray"];
     const tileRenders = {
-        grass: ['abstract50', "hsl(100, 30%, 50%)"],
-        desert: ['abstract50', "hsl(50, 20%, 70%)"],
-        mountain: ['abstract50', "hsl(30, 10%, 80%)"],
-        river: ['abstract50', "hsl(250, 50%, 30%)"],
-        wall: ['wall', "brown"],
+        grass: "hsl(100, 30%, 50%)",
+        desert: "hsl(50, 20%, 70%)",
+        mountain: "hsl(30, 10%, 80%)",
+        river: "hsl(250, 50%, 30%)",
     };
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let y = camera.y - halfheight; y <= camera.y + halfheight; y++) {
         for (let x = camera.x - halfwidth; x <= camera.x + halfwidth; x++) {
             if (map.inBounds({x, y})) {
                 let tile = map.tiles.get({x, y});
-                let render = tileRenders[tile] ?? unknownRender;
-                drawSprite(x + dx, y + dy,
-                           render[0], render[1]);
+                let render = tileRenders[tile] ?? "red";
+                drawSprite(x + dx, y + dy, null, render);
             }
         }
     }
