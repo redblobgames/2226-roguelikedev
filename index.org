@@ -260,25 +260,44 @@ In addition to the /floor/ types (grass, desert, water) I also want to place obj
 :CUSTOM_ID: map-building
 :END:
 
-The generated map is only the wilderness. In this game the player will be building the rooms. I need to figure out the UI for that. If I had a /facing/ direction then the player could build in front of themselves. But the keystrokes for that are annoying. If you want to build a wall on tiles 1, 2, 3:
+The generated map is only the wilderness. In this game the player will be building the rooms. I need to figure out the UI for that. If I had a /facing/ direction then the player could build in front of themselves. My first idea was to have you /pick up/ building materials and then /place/ them for building. But the keystrokes for that are annoying. If you want to build a wall on tiles 1, 2, 3:
 
 #+begin_example
   1  2  3
   4  5  6
 #+end_example
 
-You have to move to 4, press ~Up~ to face towards 1, press ~E~ to build, then press ~Right~ to face right, then press ~Right~ to move right, then press ~Up~ to face towards towards 2, press ~E~ to build, etc.
+You have to first pick up the stone, then move to 4, press ~Up~ to face towards 1, press ~E~ to build, then press ~Right~ to face right, then press ~Right~ to move right, then press ~Up~ to face towards towards 2, press ~E~ to build, etc.
 
-I also considered having the player /pick up/ building materials and then place them for building, but I think that's even more awkward.
+It'd be simpler if you didn't have to pick up the materials, but that's not the real problem. It's three keystrokes per tile. I want to reduce the number of keystrokes per tile.
 
-So maybe I shouldn't have the player move around while building. What if a build key ~B~ starts build mode (like vim's insert vs normal mode), and then you can move the cursor around freely to build things? Then pressing ~B~ again goes back to the player. This would be /placing orders/ that your ally NPCs would actually build. For now I can have it build immediately without waiting for NPCs, and then change it once I add NPCs.
+The next idea was to have a build key ~B~ to switch to build mode, like vim's insert vs normal mode. In build mode you can move the cursor around freely to build things. Then press ~B~ again to go back to the player mode. What are the keys in build mode? I guess you'd have to choose what to build: ~W~ for wall, ~S~ for stockpile, etc. In the example, you would move to 4, press ~B~ to switch modes, then ~Up~ to move to 1, ~W~ for wall, ~Right~ to move to 2, ~W~ for wall, ~Right~ to move to 3, ~W~ for wall, then ~B~ to exit build mode, which would return you back to the player at 4.
+
+This is two keystrokes per tile.
+
+The next idea was to have commands inside build mode. In the example, you would move to 4, press ~B~ to start build mode, ~W~ to start wall-building mode, then ~Up~ to move to 1 and build a wall there, then ~Right~ to move to 2 and build there, then ~Right~ to move to 3 and build there, then ~W~ to exit wall-building mode, then ~B~ to exit build mode, which would return you back to the player at 4.
+
+This is down to one keystroke per tile. Other modes like stockpile-drawing mode might use arrow keys to mark a rectangle instead of a line. And others like placing an object might use one or two keystrokes to choose the object, but then return you to build mode. It's looking like this:
+
+#+begin_export html
+<figure>
+  <img src="screenshots/build-mode-idea-3.png" />
+  <figcaption>Player and build and specialized modes</figcaption>
+</figure>
+#+end_export
+
+It'd be simpler if you could directly go into wall-building mode by pressing ~W~ from the player mode. But that means you can't start a wall anywhere, but only next to where the player can walk. So I still need build mode to be able to choose where to start the wall.
+
+Stepping back a bit, I had been starting from the "adventure mode" style movement for your player character, but I have to admit, I haven't come up with any ideas for what you'd actually /do/ in player mode. So maybe I should drop player mode, and treat build mode as the normal mode. Then you'd press the verb (~W~ for walls, ~S~ for stockpiles, ~D~ for doors, etc.) which would take you into a specialized mode for creating that type of object, and then you'd return to the main mode to move around.
+
+{ Maybe ~Esc~ to cancel building walls/stockpiles and ~W~ / ~S~ / etc. to confirm building, or maybe ~Enter~ to confirm }
 
 * TODO Field of view
 :PROPERTIES:
 :CUSTOM_ID: section-4
 :END:
 
-1. no field of view; you can see everything
+1. no field of view; you can see everything? but maybe mountain tiles are limited to only adjacent to dug-out areas
 1. scrolling map
 
 * TODO Placing enemies
@@ -287,7 +306,7 @@ So maybe I shouldn't have the player move around while building. What if a build
 :END:
 
 1. there will be friendly npcs
-
+1. I need lots of pathfinding
 
 * TODO Combat
 :PROPERTIES:
@@ -348,6 +367,6 @@ So maybe I shouldn't have the player move around while building. What if a build
 #+begin_export html
 <x:footer>
   Created 28 Jun 2022; &#160;
-  <!-- hhmts start -->Last modified: 08 Jul 2022<!-- hhmts end -->
+  <!-- hhmts start -->Last modified: 09 Jul 2022<!-- hhmts end -->
 </x:footer>
 #+end_export
