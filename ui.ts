@@ -7,7 +7,7 @@
 export { print } from "./console";
 import * as input from "./input";
 import { entities } from "./simulation";
-import { map } from "./map";
+import { map, Edge } from "./map";
 import { clamp } from "./util";
 
 // Drawing area
@@ -76,33 +76,110 @@ export function render() {
 
     const dx = halfwidth - camera.x;
     const dy = halfheight - camera.y;
-    function draw(x, y, sprite, color: string) {
-        drawSprite(x + dx, y + dy, sprite, color);
-    }
+    let view = {
+        left: Math.floor(camera.x - halfwidth),
+        right: Math.ceil(camera.x + halfwidth),
+        top: Math.floor(camera.y - halfheight),
+        bottom: Math.ceil(camera.y + halfheight),
+    };
     
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.scale(TILE_SIZE, TILE_SIZE);
+    ctx.translate(dx, dy);
+
+    // Tile backgrounds
     const tileRenders = {
         grass: "hsl(100, 30%, 50%)",
         desert: "hsl(50, 20%, 70%)",
         mountain: "hsl(30, 10%, 80%)",
         river: "hsl(250, 50%, 30%)",
     };
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let y = Math.floor(camera.y - halfheight); y <= Math.ceil(camera.y + halfheight); y++) {
-        for (let x = Math.floor(camera.x - halfwidth); x <= Math.ceil(camera.x + halfwidth); x++) {
+    function drawTile(x: number, y: number, sprite: string, color: string) {
+        ctx.translate(x, y);
+        ctx.scale(1/512, 1/512);
+        ctx.stroke(sprites[sprite] ?? defaultPath);
+        ctx.fillStyle = color;
+        ctx.fill(sprites[sprite] ?? defaultPath);
+        ctx.scale(512, 512);
+        ctx.translate(-x, -y);
+    }
+    ctx.save();
+    ctx.lineJoin = 'bevel'; // some of the game-icons have sharp corners
+    ctx.lineWidth = 1/(TILE_SIZE/512);
+    ctx.strokeStyle = "black";
+    for (let y = view.top; y <= view.bottom; y++) {
+        for (let x = view.left; x <= view.right; x++) {
             let tile = map.tiles.get({x, y});
             let render = tileRenders[tile] ?? "red";
-            draw(x, y, null, render);
+            drawTile(x, y, null, render);
             let object = map.objects.get({x, y});
             if (object) {
-                draw(x, y, object, "white"); // TODO: need to figure out colors, sizes
+                drawTile(x, y, object, "white"); // TODO: need to figure out colors, sizes
             }
         }
     }
+    ctx.restore();
 
-    for (let entity of entities) {
-        draw(entity.location.x, entity.location.y, entity.appearance.sprite, "yellow");
+    // Tile edges
+    function drawEdge(edge: Edge) {
+        let edgeType = map.edges.get(edge);
+        if (!edgeType) return;
+        let {x, y, s} = edge;
+        let [dirX, dirY] = s === 'W' ? [0, 1] : [1, 0];
+        ctx.beginPath();
+        switch (edgeType) {
+            case 'wall':
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + dirX, y + dirY);
+                break;
+            case 'door':
+                ctx.moveTo(x + dirX*0.1 - dirY*0.1, y + dirY*0.1 + dirX*0.1);
+                ctx.lineTo(x + dirX*0.1 + dirY*0.1, y + dirY*0.1 - dirX*0.1);
+                ctx.moveTo(x + dirX*0.9 - dirY*0.1, y + dirY*0.9 + dirX*0.1)
+                ctx.lineTo(x + dirX*0.9 + dirY*0.1, y + dirY*0.9 - dirX*0.1)
+                break;
+        }
+        ctx.stroke();
     }
-    input.current.render(draw);
+    ctx.save();
+    // HACK: translate() here because tile rendering is slightly off,
+    // by 1/4 of the line width when drawing tiles; TODO: why?
+    ctx.translate(-0.25/TILE_SIZE, -0.25/TILE_SIZE);
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 2.5 / TILE_SIZE;
+    ctx.lineCap = 'square';
+    for (let y = view.top; y <= view.bottom; y++) {
+        for (let x = view.left; x <= view.right; x++) {
+            drawEdge({x, y, s: 'W'});
+            drawEdge({x, y, s: 'N'});
+        }
+    }
+    ctx.restore();
+
+    // TODO: tile foregrounds
+    
+    // Entities
+    ctx.save();
+    ctx.lineJoin = 'bevel'; // some of the game-icons have sharp corners
+    ctx.lineWidth = 1/(TILE_SIZE/512);
+    ctx.strokeStyle = "black";
+    for (let entity of entities) {
+        let {x, y} = entity.location;
+        if (view.left <= x && x <= view.right
+            && view.top <= y && y <= view.bottom) {
+            drawTile(x, y, entity.appearance.sprite, "yellow");
+        }
+    }
+
+    // TODO: need to figure out a way to convey the current transform
+    // to the external render function. Currently scaled to tiles
+    // being 1x1, and then drawTile handles the further scaling to the
+    // 512x512 grid. But also need to convey line width somehow
+    input.current.render(drawTile);
+    ctx.restore();
+    
+    ctx.restore();
 }
 
 input.install(canvas, render);

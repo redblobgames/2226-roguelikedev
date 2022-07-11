@@ -35,8 +35,8 @@ abstract class InputMode {
     instructionsHtml = `Instructions go here`;
     instructionsClass = "";
     moved() { }
-    render(draw) {
-        draw(this.x, this.y, 'move', "red");
+    render(drawTile) {
+        drawTile(this.x, this.y, 'move', "red");
     }
     
     constructor(public x: number, public y: number) {
