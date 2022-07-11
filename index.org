@@ -4,7 +4,7 @@
 
 Each summer r/roguelikedev has a [[https://old.reddit.com/r/roguelikedev/wiki/python_tutorial_series][summer event]] in which we all make a simple roguelike, roughly following the libtcod roguelike tutorial. I've tried several times and [[href:/x/2025-roguelike-dev/][actually finished in 2020]], using [[https://ondras.github.io/rot.js/hp/][rot.js]] and Javascript. I kept the scope down by implementing only the topics from the tutorial. Then [[href:/x/2126-roguelike-dev/][in 2021]] I implemented topics I wanted to try: thin walls, graphics, animations, openable doors, new map generator. I had many more things I wanted to try but I was too ambitious, and didn't finish.
 
-For this year's summer event I'd like to do something more "fortress mode" and less "adventure mode".  This may prove too ambitious; we shall see.
+For this year's summer event I'd like to do something more "fortress mode" and less "adventure mode".  This may prove too ambitious; we shall see. This project for me is not about making a complete, fun, polished game. It's about exploring what a "fortress mode" game might involve.
 
 #+include: "game.html" export html
 
@@ -248,13 +248,6 @@ camera.y = clamp(camera.y,
 
 I think there are more fun things that I could do but I'll leave that for later.
 
-** TODO Resource placement
-:PROPERTIES:
-:CUSTOM_ID: map-resources
-:END:
-
-In addition to the /floor/ types (grass, desert, water) I also want to place objects on top: trees, stones, berries, gems.
-
 ** TODO Building
 :PROPERTIES:
 :CUSTOM_ID: map-building
@@ -262,7 +255,7 @@ In addition to the /floor/ types (grass, desert, water) I also want to place obj
 
 *** UI
 :PROPERTIES:
-:CUSTOM_ID: building-ui
+:CUSTOM_ID: building-ui-1
 :END:
 
 The generated map is only the wilderness. In this game the player will be building the rooms. I need to figure out the UI for that. If I had a /facing/ direction then the player could build in front of themselves. My first idea was to have you /pick up/ building materials and then /place/ them for building. But the keystrokes for that are annoying. If you want to build a wall on tiles 1, 2, 3:
@@ -320,14 +313,14 @@ For the different modes, I created a /key map/ object:
 
 #+begin_src js
 actions = {
-    ArrowRight() { playerMoveBy(+1, 0); },
-    ArrowLeft()  { playerMoveBy(-1, 0); },
-    ArrowDown()  { playerMoveBy(0, +1); },
-    ArrowUp()    { playerMoveBy(0, -1); },
+    key_ArrowRight() { playerMoveBy(+1, 0); },
+    key_ArrowLeft()  { playerMoveBy(-1, 0); },
+    key_ArrowDown()  { playerMoveBy(0, +1); },
+    key_ArrowUp()    { playerMoveBy(0, -1); },
 };
 #+end_src
 
-In Javascript, ~{ … }~ works both as a map (Python dict) and an object. When a key ='ArrowRight'=  comes in, I can call ~actions[event.key]()~ to run the corresponding action. When I switch to wall-building mode, I'll assign a different key map to =actions=.
+In Javascript, ~{ … }~ works both as a map (Python dict) and an object. When a key ='ArrowRight'=  comes in, I can call ~actions["key_" + event.key]()~ to run the corresponding action. When I switch to wall-building mode, I'll assign a different key map to =actions=.
 
 There's some duplicate code in there to handle the arrow keys for each of the building modes, but I'll clean that up later once I have something that works.
 
@@ -340,81 +333,161 @@ There's some duplicate code in there to handle the arrow keys for each of the bu
 
 I implemented the beginnings of wall building but the UI is pretty rough. I need a way to /preview/ the walls that are going to be put down. That means =actions= isn't sufficient. I need to maintain state, and also hook into the rendering. Hm.
 
+*** UI, part two
+:PROPERTIES:
+:CUSTOM_ID: building-ui-2
+:END:
+
+I often come up with more ideas during [[https://amitp.blogspot.com/2022/05/beer-mode-and-coffee-mode.html]["beer mode"]], a relaxed state in which I am more creative. This can happen while going for a walk, or going to sleep, or taking a shower ("shower thoughts").  I had a UI thought last night: I've been focused on building /walls/ and then the /rooms/ would come later. What if the player marked the /room/, and then the walls were calculated? I looked through my notes to see what other games did:
+
+- Dwarf Fortress: build the walls, then mark a room by expanding a region from a piece of furniture. But being Dwarf Fortress, there are also similar concepts done differently, like creating [[https://dwarffortresswiki.org/index.php/DF2014:Stockpile#Allocating_stockpiles][stockpiles]] or mining designations by marking two corners of a rectangle, or creating [[https://dwarffortresswiki.org/index.php/DF2014:Farming][farm plots]] by expanding a rectangle.
+- Oxygen Not Included: build the walls, then the game automatically figures out rooms, and assigns one room type.
+- RimWorld: build the walls, then the game automatically figures out rooms, and assigns one or more room types.
+- Prison Architect: build the walls, then mark the room type you want, and it will give you a list of requirements for that room.
+- Two Point Hospital: build the room on a grid, and place a door and needed items; walls are built automatically. Hey, this matches the idea I had last night.
+
+Of these, I liked Two Point Hospital and Prison Architect's approaches quite a bit. They were not only easy to understand what room was going to be there, they displayed what was needed to make the room work. Prison Architect let you build the room and then then you will be told what to do to make it work. Two Point Hospital won't let you even build the room until you populate it with the needed items.
+
+I think the rooms-first approach works better with thin walls than with thick walls. So if I decide to do this, I need to:
+
+1. implement /thin walls/
+1. change the building ui to focus on /marking rooms/ (also figure out how to allow non-rectangular rooms, and modifying existing rooms; see [[https://www.youtube.com/watch?v=hiIOWmFusCs][Two Point Hospital]]'s UI for this)
+1. automatically calculate the needed walls
+1. add a door marking ui
+
+I also realized that I was so focused on building walls that I hadn't thought ahead to rooms, or what rooms are for, or how the player will interact with rooms, or whether I even need rooms. One advantage of following the roguelikedev summer tutorial is that I don't have to think about that, and I can focus on implementation. But since I'm trying to make a different style of game, I really need to be thinking farther ahead. So I took a break from implementation and started adding some ideas to the rest of this document.
+
+
+
 * TODO Field of view
 :PROPERTIES:
 :CUSTOM_ID: section-4
 :END:
 
-1. no field of view; you can see everything? but maybe mountain tiles are limited to only adjacent to dug-out areas
-1. scrolling map
+My initial thought was that field of view doesn't apply to a fortress-style game. And I don't think I want fog of war either, as I will keep things simpler for this project by having small maps. But I think I /do/ want to make it so that you only see underground areas after you excavate them. But I don't think that requires saving per-tile data. Instead, I'll have a rule that says you can see any tile if it's open, /or/ if it's adjacent to a tile that's open. As you dig into the mountain, you'll be able to see the tiles adjacent to your corridor, but no deeper.
+
+I'm going to convert this game to be real-time instead of turn-based. I think that makes more sense for a fortress-mode style game.
 
 * TODO Placing enemies
 :PROPERTIES:
 :CUSTOM_ID: section-5
 :END:
 
-1. there will be friendly npcs
-1. I need lots of pathfinding
+I am going to have friendly NPCs that are performing the fortress tasks (construction, digging, crafting, farming, etc.).I think the focus here will be on /pathfinding/ and /job assignment/, both algorithm-heavy problems.  Given how far beyond a reasonable scope I am, I plan to /not/ have enemy NPCs.
+
+*** NPCs
+:PROPERTIES:
+:CUSTOM_ID: npc-jobs
+:END:
+
+NPCs need to /pick/ a job, and then /move/ towards the job, and then /do/ the job.
+
+1. *Picking*: Goblin Camp uses the Munkres-Kuhn algorithm. It's O(N³), but N is small so it's probably ok. RimWorld and Oxygen Not Included have a job priority system that the player can control. Dwarf Fortress starts out with the player manually assigning jobs, but then can hire a "manager" dwarf who will then take over that job from the player. I really like the idea of doing something manually and then outsourcing or automating it.
+1. *Moving*. Pathfinding with A* is the obvious approach. But pathfinding with BFS will probably be an easier place to start. This may finally be a project where I can try out [[https://www.redblobgames.com/pathfinding/heuristics/differential.html][differential heuristics]].
+1. *Doing*. A job takes some /time/ and then has some /effect/ on the world. During that time the job may involve /locking/ some objects so they can't be used by others.
+
+** TODO Resources
+:PROPERTIES:
+:CUSTOM_ID: resources
+:END:
+
+In addition to the /floor/ types (grass, desert, water) I also want to place objects on top: trees, stones, berries, gems. This will be useful for gathering jobs.
+
 
 * TODO Combat
 :PROPERTIES:
 :CUSTOM_ID: section-6
 :END:
 
-1. not sure if I'll have combat at all
+I won't have enemy NPCs, so I don't need combat, right? But there might be some limited combat in the form of hunting for food. Given how the scope is too large, I should probably drop hunting combat from the list. If I have hunting, it could be that when the NPC reaches the animal, the animal dies and turns into food. That will put some more stress on the pathfinding system, but at least it's using an existing system instead of me having to write a new one.
 
 * TODO Interface
 :PROPERTIES:
 :CUSTOM_ID: section-7
 :END:
 
+I used to write simulations and then come up with the interface, but I think that leads to parts of the simulation the player can't see. These days I instead want to start with the interface. What does the player experience? What can they see? If they can't see it, is it useful to simulate? What are the decisions they need to make, and what information do they need to make those decisions?
+
+I realized I need to at least start thinking about this early in the project. I looked through my notes for other games I've liked: Dwarf Fortress, Rimworld, Oxygen Not Included, Factorio, Prison Architect, SimAirport, Airport CEO, Transport Tycoon, Two Point Hospital, Honey I Joined A Cult, Another Brick in the Mall, Academia School Simulator, Overcrowd.
+
+You'll start out with a handful of colonists, and some supplies, similar to Dwarf Fortress, Rimworld, ONI. You're trying to provide food, shelter, dining, entertainment, medicine for your colonists. 
+
+One of the things I very much want in a game of this style is gradual progression both in systems and complexity. 
+
+- Many games gate this through a tech tree. Other progression involves number of people, the skills of those people, or advanced materials. I would like progression of some sort but I fear it may be out of scope for this project.
+- I want to encourage /redesign/, not up front design. I like that Factorio has zero cost of moving something. In games with digging/mining, that's usually not undoable so it discourages redesign. Some games actively make this hard, like Airport CEO not allowing me to change a gate without shutting it down, but to shut it down I have to sit there and wait a long time before no airplanes want to use the gate.
+- I want to see more systems as you progress through the game. Some games introduce too many systems early on. Prison Architect especially requires you to build lots of rooms before you can even open your prison, and then there are too few things to do later on. RimWorld seems pretty good about this, by allowing you to rely on your initial supplies and what you can find in nature. But I am not sure my game will be big enough for this to matter.
+- I want to see the systems progress from low cost low return to high cost high return. For example in Oxygen Not Included the hamster wheel power is easy to set up, but doesn't provide a lot of power, and does so at high cost. Later systems like petroleum power take a lot more investment but provide much more power.
+- Although I like games with indiviudal personalities and skills per colonist, I think that I'm going to not pursue that for this project. It only works for a small number of colonists, and I don't think I will have enough time to work on this anyway.
+- I want to make system problems visible. In Factorio you can scan for bottlenecks, and use signals and speakers to flag problems. In Airport CEO on the other hand it seemed hard to find out what's wrong or how to fix it.
+- I don't want to use grants/contracts/quests to push early progression. I feel like Prison Architect inspired other games (SimAiport, Airport CEO, Academia School Simulator) to do this. Those games required you to build too many systems up front so it seemed reasonable to have a system to help you prioritize other systems. But I'd rather do this by having fewer systems to work with early on, so that the choices are more clear.
+- A lot of these games end up with me sitting around waiting for something to happen. Then they offer "VCR controls" (pause, play, fast forward) to help you deal with too many events (pause) or too few events (fast forward). It seems like a common problem, which I want solved through game design. I think Transport Tycoon and Factorio have been best at avoiding this problem, for reasons I won't write about here. But given that the scope of this project does /not/ include balance and fun, I am not planning to even try solving this problem here.
+- I'd like exploration to (1) be interesting, (2) lead to different base designs. Factorio is the worst at this. Not only is exploration uninteresting, the designs aren't driven by the map. Oxygen Not Included has been pretty good about this. Not only do you find objects and creatures while exploring, the varied biomes give you a lot of variety in base layout.
+- Some of these games have an inside/outside boundary. In Dwarf Fortress and RimWorld you have a colony ("inside") where you build things and a bigger world ("outside") which has encounters and raiders and traders. Factorio is all inside. Prison Architect, SimAirport, and similar games have supplies and people coming from the outside, and even have a map object (major road) to mark this.
+- Some games have a lot of buildable objects, but sometimes they only fit within certain rooms. Another Brick in the Mall and Honey I Joined a Cult are examples that have /long/ lists of objects, only some applicable. I want to avoid this.  But that's easy in my case because I won't have time to make lots of objects. Oxygen Not Included, Rimworld, and others will put them into categories.
+- A minor complaint about some of these games: if there's time between when I build something and when it's built, I want to be able to /configure/ the object before it's built. I don't want to have to remember to come back to configure it. I'd like to handle this properly in my project but it's a low priority compared to all the other things.
+
+So what systems could I implement? With the big caveat that I won't time for all of them:
+
+- Food: foraging, farming, hunting, ranching, bees/honey, cooking, preserving
+- Clothing: gathered materials, cotton, wool, leather
+- Furniture: floor, wooden, cloth, leather
+- Tools: wooden, copper, iron, steel
+- Building: wood, stone, metal
+- Recreation: games, paintings, sculptures, library
+
+Room types: bedroom, dining, kitchen, indoor storage, outdoor storage, farms, ranches, workshops of various sorts, recreation.
+
+
 * TODO Items and inventory
 :PROPERTIES:
 :CUSTOM_ID: section-8
 :END:
 
-1. individual inventory, or everything owned by the colony?
+I have gotten rid of the player character so there's no player inventory. But the NPCs could be carrying things. And there are things on the map. I think I need to figure out /stockpiles/ and also NPC inventory. The simplest thing would be for NPCs to carry only one thing at a time, or only as much as is needed for the current job.
 
 * TODO Ranged scrolls and targeting
 :PROPERTIES:
 :CUSTOM_ID: section-9
 :END:
 
-1. maybe planting and harvesting instead
+I think given how I'm biting off more than I can chew, I won't get around to combat, and I won't have scrolls or targeting. But I do want to have multiple types of jobs, including harvesting and farming, so maybe I can do that in this section.
+
+In RimWorld and Two Point Hospital, the job objects reserve space for standing. I think that's a good idea.
 
 * TODO Saving and loading
 :PROPERTIES:
 :CUSTOM_ID: section-10
 :END:
 
-1. probably will skip
+I am planning to skip this. It's not hard, but it's not something I'm interested in spending my time on for this project.
 
 * TODO Dungeon levels
 :PROPERTIES:
 :CUSTOM_ID: section-11
 :END:
 
-1. not applicable, need to find another topic for this week
+I don't plan to have z-levels. But I'm sure I will find something else to do this week.
 
 * TODO Increasing difficulty
 :PROPERTIES:
 :CUSTOM_ID: section-12
 :END:
 
-1. want you to have to learn more systems as you scale up (more people or more advanced tech)
+I want you to have to learn more systems as you scale up. This could be more advanced tech, something to support larger populations, or something involving increased skills.
 
 * TODO Gearing up
 :PROPERTIES:
 :CUSTOM_ID: section-13
 :END:
 
-1. not applicable, need to find another topic for this week
+Tools might qualify. A tool-making workshop could give NPCs tools, and then the tools would make them more effective.
 
 * TODO Conclusion
 
 #+begin_export html
 <x:footer>
   Created 28 Jun 2022; &#160;
-  <!-- hhmts start -->Last modified: 09 Jul 2022<!-- hhmts end -->
+  <!-- hhmts start -->Last modified: 10 Jul 2022<!-- hhmts end -->
 </x:footer>
 #+end_export
