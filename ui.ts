@@ -5,7 +5,8 @@
  */
 
 export { print } from "./console";
-import { entities, player } from "./simulation";
+import * as input from "./input";
+import { entities } from "./simulation";
 import { map } from "./map";
 import { clamp } from "./util";
 
@@ -28,7 +29,8 @@ if (window.devicePixelRatio && window.devicePixelRatio != 1) {
 
 
 // Sprites
-function S(svg: String): Path2D {
+declare function require(path: string): string;
+function S(svg: string): Path2D {
     // This relies on the way game-icons.net svgs are structured,
     // as a single <path d="…"/>
     return new Path2D(svg.replace(/.* d="/, "").replace(/".*/, ""));
@@ -60,21 +62,24 @@ function drawSprite(x: number, y: number, name: string | null, color="white") {
 }
 
 
-
 export function render() {
     const halfwidth = VIEWWIDTH / 2;
     const halfheight = VIEWHEIGHT / 2;
     let camera = {
-        x: clamp(player.location.x + 0.5,
+        x: clamp(input.current.x + 0.5,
                  map.bounds.left + halfwidth,
                  map.bounds.right - halfwidth + 1),
-        y: clamp(player.location.y + 0.5,
+        y: clamp(input.current.y + 0.5,
                  map.bounds.top + halfheight,
                  map.bounds.bottom - halfheight + 1),
     };
 
     const dx = halfwidth - camera.x;
     const dy = halfheight - camera.y;
+    function draw(x, y, sprite, color: string) {
+        drawSprite(x + dx, y + dy, sprite, color);
+    }
+    
     const tileRenders = {
         grass: "hsl(100, 30%, 50%)",
         desert: "hsl(50, 20%, 70%)",
@@ -86,19 +91,19 @@ export function render() {
         for (let x = Math.floor(camera.x - halfwidth); x <= Math.ceil(camera.x + halfwidth); x++) {
             let tile = map.tiles.get({x, y});
             let render = tileRenders[tile] ?? "red";
-            drawSprite(x + dx, y + dy, null, render);
+            draw(x, y, null, render);
             let object = map.objects.get({x, y});
             if (object) {
-                drawSprite(x + dx, y + dy, object, "white"); // TODO: need to figure out colors, sizes
+                draw(x, y, object, "white"); // TODO: need to figure out colors, sizes
             }
         }
     }
+
     for (let entity of entities) {
-        drawSprite(entity.location.x + dx, entity.location.y + dy,
-                   entity.appearance.sprite, "yellow");
+        draw(entity.location.x, entity.location.y, entity.appearance.sprite, "yellow");
     }
-    drawSprite(player.location.x + dx, player.location.y + dy,
-               player.appearance.sprite, "yellow");
+    input.current.render(draw);
 }
 
+input.install(canvas, render);
 render();

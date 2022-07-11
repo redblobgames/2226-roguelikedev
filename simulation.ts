@@ -6,5 +6,4 @@
 
 import { Entity } from "./entity";
 
-export const player = new Entity({x: 5, y: 7}, {sprite: 'move'});
-export let entities = [];
+export let entities: Entity[] = [];
