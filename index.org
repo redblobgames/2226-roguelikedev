@@ -294,7 +294,7 @@ Other thoughts: Should I switch to the mouse? Dragging a line or rectangle proba
 
 *** Implementation
 :PROPERTIES:
-:CUSTOM_ID: building-implementation
+:CUSTOM_ID: building-implementation-1
 :END:
 
 I refactored the code a little bit, moving keyboard handling into its own module. It's starting to have a bit to deal with:
@@ -357,7 +357,27 @@ I think the rooms-first approach works better with thin walls than with thick wa
 
 I also realized that I was so focused on building walls that I hadn't thought ahead to rooms, or what rooms are for, or how the player will interact with rooms, or whether I even need rooms. One advantage of following the roguelikedev summer tutorial is that I don't have to think about that, and I can focus on implementation. But since I'm trying to make a different style of game, I really need to be thinking farther ahead. So I took a break from implementation and started adding some ideas to the rest of this document.
 
+I slept on this idea and decided I should implement it. Thin walls will /probably/ simplify things for my handling of rooms, even though it's a little more work to represent them. There will no longer be door /tiles/, so NPCs will never be standing in a doorway. Instead, every tile will be part of a room, or the outdoors. There will be walls between rooms, and some of those walls will have open doorways in them.
 
+#+begin_export html
+<figure>
+  <img src="screenshots/section-3d-thin-walls.png" />
+  <figcaption>Thin vs thick walls</figcaption>
+</figure>
+#+end_export
+
+Of course now I need to go back and update the implementation.
+
+*** Implementation, part two
+:PROPERTIES:
+:CUSTOM_ID: building-implementation-2
+:END:
+
+Fortunately I already implemented thin walls in [[href:/x/2126-roguelike-dev/][last year's r/roguelikedev project]], so I went through that and picked out some useful functions. I represent walls as a tile location and then either ~W~ for the western edge of the tile or ~N~ for the northern edge of the tile. I don't need the south or east sides, because those are the north or west sides of the next tile over. [[href:/grids/edges/][I've written about this before]] but it was last year that I got to really put it to the test, and it worked pretty well.
+
+I also had to update the rendering code to handle walls. For now I have only walls and doorways. While I was working on the rendering code, I ran into some inconsistencies in coordinate systems. The /tile/ coordinates are 1 step = 1 tile. The /pixel/ coordinates are 22 pixels = 1 tile (although this might vary if I want to add zooming later). If I want to draw outlines, they are 1/22 of a tile wide. The /sprite/ coordinates are 512 pixels = 1 tile. So their outlines are 23.2 pixels wide. Although it's fine for the rendering code to keep track of these things, I also want the input-handling code, and maybe other modules, to be able to draw on the screen, and that means they need to know about these scales too. I haven't come up with a good solution yet.
+
+With thin walls, I need to change the input handling code from /drawing walls/ to /drawing rooms/. To start with, the player will be able to mark a rectangle by pointing at the two corners. But I also want to support non-rectangular rooms so I might make it work by starting with a single rectangle and then adding/subtracting rectangles to it.
 
 * TODO Field of view
 :PROPERTIES:
@@ -488,6 +508,6 @@ Tools might qualify. A tool-making workshop could give NPCs tools, and then the 
 #+begin_export html
 <x:footer>
   Created 28 Jun 2022; &#160;
-  <!-- hhmts start -->Last modified: 10 Jul 2022<!-- hhmts end -->
+  <!-- hhmts start -->Last modified: 11 Jul 2022<!-- hhmts end -->
 </x:footer>
 #+end_export
