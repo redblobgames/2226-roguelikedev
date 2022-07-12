@@ -142,6 +142,7 @@ export function render() {
         }
         ctx.stroke();
     }
+    map.rebuildAllEdges(); // HACK: placeholder
     ctx.save();
     // HACK: translate() here because tile rendering is slightly off,
     // by 1/4 of the line width when drawing tiles; TODO: why?
@@ -157,6 +158,22 @@ export function render() {
     }
     ctx.restore();
 
+    // TODO: room borders instead of room numbers
+    ctx.save();
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+    ctx.font = '0.5px monospace';
+    ctx.fillStyle = "white";
+    for (let y = view.top; y <= view.bottom; y++) {
+        for (let x = view.left; x <= view.right; x++) {
+            let roomId = map.roomAt.get({x, y});
+            if (!roomId) continue;
+            ctx.fillText(roomId.toString(), x+0.5, y+0.5);
+        }
+    }
+    ctx.restore();
+    
+    
     // TODO: tile foregrounds
     
     // Entities

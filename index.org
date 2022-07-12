@@ -138,7 +138,7 @@ I put in some dummy data for now to test my renderer. Generating the map will be
 #+end_export
 
 
-* TODO Generating a map
+* Generating a map
 :PROPERTIES:
 :CUSTOM_ID: generating-a-map
 :END:
@@ -248,7 +248,7 @@ camera.y = clamp(camera.y,
 
 I think there are more fun things that I could do but I'll leave that for later.
 
-** TODO Building
+** Building
 :PROPERTIES:
 :CUSTOM_ID: map-building
 :END:
@@ -375,9 +375,18 @@ Of course now I need to go back and update the implementation.
 
 Fortunately I already implemented thin walls in [[href:/x/2126-roguelike-dev/][last year's r/roguelikedev project]], so I went through that and picked out some useful functions. I represent walls as a tile location and then either ~W~ for the western edge of the tile or ~N~ for the northern edge of the tile. I don't need the south or east sides, because those are the north or west sides of the next tile over. [[href:/grids/edges/][I've written about this before]] but it was last year that I got to really put it to the test, and it worked pretty well.
 
-I also had to update the rendering code to handle walls. For now I have only walls and doorways. While I was working on the rendering code, I ran into some inconsistencies in coordinate systems. The /tile/ coordinates are 1 step = 1 tile. The /pixel/ coordinates are 22 pixels = 1 tile (although this might vary if I want to add zooming later). If I want to draw outlines, they are 1/22 of a tile wide. The /sprite/ coordinates are 512 pixels = 1 tile. So their outlines are 23.2 pixels wide. Although it's fine for the rendering code to keep track of these things, I also want the input-handling code, and maybe other modules, to be able to draw on the screen, and that means they need to know about these scales too. I haven't come up with a good solution yet.
+I also had to update the rendering code to handle walls. For now I have only walls and doorways. While I was working on the rendering code, I ran into some inconsistencies in coordinate systems. The /tile/ coordinates are 1 step = 1 tile. The /pixel/ coordinates are 22 pixels = 1 tile (although this might vary if I want to add zooming later). If I want to draw outlines, they are 1/22 of a tile wide. The /sprite/ coordinates are 512 pixels = 1 tile. So their outlines are 23.2 pixels wide. Although it's fine for the rendering code to keep track of these things, I also want the input-handling code, and maybe other modules, to be able to draw on the screen, and that means they need to know about these scales too. I need to pick a coordinate system and stick to it.
 
-With thin walls, I need to change the input handling code from /drawing walls/ to /drawing rooms/. To start with, the player will be able to mark a rectangle by pointing at the two corners. But I also want to support non-rectangular rooms so I might make it work by starting with a single rectangle and then adding/subtracting rectangles to it.
+With thin walls, I need to change the input handling code from /drawing walls/ to /drawing rooms/. To start with, the player will be able to mark a rectangle by pointing at the two corners. But I also want to support non-rectangular rooms so I might make it work by starting with a single rectangle and then adding/subtracting rectangles to it. Maybe: if you start a room in an existing room it adds a new rectangle. Maybe: press shift when starting a room to remove a rectangle.
+
+#+begin_export html
+<figure>
+  <img src="screenshots/section-3e-rooms.png" />
+  <figcaption>Rectangular rooms</figcaption>
+</figure>
+#+end_export
+
+Minor: I've been pretty happy with my right hand on the arrows or numpad, and the left hand on the commands (~R~ for room, ~W~ for wall). But ~Enter~ is far away from both, so I think I will change that to be a left hand command.
 
 * TODO Field of view
 :PROPERTIES:

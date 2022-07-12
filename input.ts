@@ -65,13 +65,56 @@ class MoveMode extends InputMode {
     instructionsClass = 'move';
     instructionsHtml = `Arrows to move; <kbd>R</kbd> to build room`;
     key_w() { setInputMode('wall'); }
+    key_r() { setInputMode('room'); }
+}
 
+class RoomMode extends InputMode {
+    start: Point;
+    instructionClass = 'room';
+    instructionsHtml = `Arrows to move to opposite corner; <kbd>Enter</kbd> to mark rectangle; <kbd>Esc</kbd> to cancel`;
+    
+    constructor(public x: number, public y: number) {
+        super(x, y);
+        this.start = {x, y};
+    }
+
+    get bounds() {
+        return {
+            left: Math.min(this.start.x, this.x),
+            right: Math.max(this.start.x, this.x),
+            top: Math.min(this.start.y, this.y),
+            bottom: Math.max(this.start.y, this.y),
+        };
+    }
+    
+    render(drawTile) {
+        let {left, right, top, bottom} = this.bounds;
+        for (let y = top; y <= bottom; y++) {
+            for (let x = left; x <= right; x++) {
+                drawTile(x, y, 'thor_hammer', "hsla(60, 100%, 50%, 0.1)");
+            }
+        }
+        drawTile(this.start.x, this.start.y, 'thor_hammer', "white");
+        drawTile(this.x, this.y, 'thor_hammer', "yellow");
+    }
+    
+    key_Escape()     { setInputMode('move'); }
+    key_Enter()      {
+        let {left, right, top, bottom} = this.bounds;
+        let roomId = map.nextRoomId++;
+        for (let y = top; y <= bottom; y++) {
+            for (let x = left; x <= right; x++) {
+                map.roomAt.set({x, y}, roomId);
+            }
+        }
+        setInputMode('move');
+    }
 }
 
 class WallMode extends InputMode {
     path: Point[] = [];
-    instructionClass = 'room';
-    instructionsHtml = `Arrows to move to opposite corner; <kbd>Enter</kbd> to mark rectangle; <kbd>Esc</kbd> to cancel`;
+    instructionClass = 'wall';
+    instructionsHtml = `Arrows to draw path; <kbd>Enter</kbd> to save; <kbd>Esc</kbd> to cancel`;
     moved() {
         this.path.push({x: this.x, y: this.y});
         // TODO: reversing over path should pop
@@ -88,8 +131,8 @@ class WallMode extends InputMode {
 
 
 export let current: InputMode = new MoveMode(5, 5);
-export function setInputMode(mode: 'move' | 'wall') {
-    current = new {move: MoveMode, wall: WallMode}[mode](current.x, current.y);
+export function setInputMode(mode: 'move' | 'room' | 'wall') {
+    current = new {move: MoveMode, room: RoomMode, wall: WallMode}[mode](current.x, current.y);
     render();
 }
 
@@ -113,6 +156,7 @@ function handleKeyDown(event: KeyboardEvent) {
     if (event.location === KeyboardEvent.DOM_KEY_LOCATION_NUMPAD) {
         key = NUMPAD_TO_ARROW[key] ?? key;
     }
+    // TODO: shift-arrow should be either 5 or 10 steps
 
     if (current[`key_${key}`]) {
         event.preventDefault();

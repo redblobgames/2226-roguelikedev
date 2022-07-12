@@ -63,7 +63,7 @@ export function edgeBetween(a: Point, b: Point): undefined | Edge {
 
 type RoomType = 'bedroom' | 'stockpile';
 type RoomId = number;
-
+type RoomMap = KeyMap<Point, RoomId>;
 type Room = {
     type: RoomType;
     tiles: Point[];
@@ -74,6 +74,9 @@ export class GameMap {
     tiles: TileMap = new KeyMap(tileToKey);
     objects: ObjectMap = new KeyMap(tileToKey);
     edges: EdgeMap = new KeyMap(edgeToKey);
+    
+    nextRoomId = 1;
+    roomAt: RoomMap = new KeyMap(tileToKey);
     rooms: Map<number, Room> = new Map();
 
     constructor() {
@@ -89,6 +92,7 @@ export class GameMap {
                 this.tiles.set({x: q, y: r}, 'grass');
             }
         }
+        
         let riverQ = 10;
         let desertStart = 20;
         let desertWidth = 10;
@@ -113,6 +117,25 @@ export class GameMap {
         const {left, top, right, bottom} = this.bounds;
         return left <= p.x && p.x <= right
             && top <= p.y && p.y <= bottom;
+    }
+
+    rebuildAllEdges() {
+        // This is a placeholder until I have NPCs who can build the walls
+        const processEdge = (edge: Edge) => {
+            let [tile1, tile2] = edgeJoins(edge);
+            let needWall = this.roomAt.get(tile1) !== this.roomAt.get(tile2);
+            let hasWall = this.edges.get(edge);
+            if (needWall && !hasWall) { this.edges.set(edge, 'wall'); }
+            if (!needWall && hasWall) { this.edges.delete(edge); }
+        };
+        
+        const {left, top, right, bottom} = this.bounds;
+        for (let y = top; y <= bottom + 1; y++) {
+            for (let x = left; x <= right + 1; x++) {
+                if (y <= bottom) processEdge({x, y, s: 'W'});
+                if (x <= right) processEdge({x, y, s: 'N'});
+            }
+        }
     }
 }
 
