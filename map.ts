@@ -87,28 +87,28 @@ export class GameMap {
         }
         
         const {left, top, right, bottom} = this.bounds;
-        for (let r = top; r <= bottom; r++) {
-            for (let q = left; q <= right; q++) {
-                this.tiles.set({x: q, y: r}, 'grass');
+        for (let y = top; y <= bottom; y++) {
+            for (let x = left; x <= right; x++) {
+                this.tiles.set({x, y}, 'grass');
             }
         }
         
-        let riverQ = 10;
+        let riverX = 10;
         let desertStart = 20;
         let desertWidth = 10;
-        for (let r = top; r <= bottom; r++) {
-            riverQ = Math.max(3, tweakNumber(riverQ));
+        for (let y = top; y <= bottom; y++) {
+            riverX = Math.max(3, tweakNumber(riverX));
             desertStart = Math.max(5, tweakNumber(desertStart));
             desertWidth = Math.max(3, tweakNumber(desertWidth));
             
-            for (let q = left; q <= right; q++) {
+            for (let x = left; x <= right; x++) {
                 let tileType: TileType =
-                    q < riverQ ? 'grass'
-                    : q < riverQ+2 ? 'river'
-                    : q < riverQ + desertStart ? 'grass'
-                    : q < riverQ + desertStart + desertWidth ? 'desert'
+                    x < riverX ? 'grass'
+                    : x < riverX+2 ? 'river'
+                    : x < riverX + desertStart ? 'grass'
+                    : x < riverX + desertStart + desertWidth ? 'desert'
                     : 'mountain';
-                this.tiles.set({x: q, y: r}, tileType);
+                this.tiles.set({x, y}, tileType);
             }
         }
     }
