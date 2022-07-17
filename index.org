@@ -16,7 +16,7 @@ Icons from [[https://game-icons.net][game-icons.net]], CC BY 3.0. Code repositor
 :PROPERTIES:
 :UNNUMBERED: t
 :SECTION_NUMBER: 0
-:CUSTOM_ID: setting-up
+:CUSTOM_ID: 0-setting-up
 :END:
 
 Compared to a Python project, I feel the set up is simpler in Javascript. I started with =game.html=:
@@ -52,7 +52,7 @@ For the rest of this project I'm going to /try/ to follow the same section numbe
 
 ** Rendering
 :PROPERTIES:
-:CUSTOM_ID: rendering
+:CUSTOM_ID: 1-rendering
 :END:
 
 I'm using =<canvas>= this year, not =<svg>=. Conveniently, the game-icons svg icons are all a /single/ =<path>=, and paths can be drawn to a =<canvas>= using [[https://developer.mozilla.org/en-US/docs/Web/API/Path2D][Path2D]]. To load the icon into memory, I can use esbuild's loaders to make importing an svg work:
@@ -71,7 +71,7 @@ Given a Path2D I can draw using any fill and outline style I want (including gra
 
 ** Keyboard
 :PROPERTIES:
-:CUSTOM_ID: keyboard
+:CUSTOM_ID: 1-keyboard
 :END:
 
 For the keyboard I'm mostly following what I did [[href:/x/2025-roguelike-dev/#key-input][two years ago]]. I add a =tabindex= to the =<canvas>= to allow it to receive keyboard focus. When it doesn't have focus, I display a message telling the player to click on the game to give it focus. I think the alternative is to make the entire window's keyboard events go to the game, but I like this approach better because it allows me to use the arrow keys for scrolling the page, or use an =<input>= box that receives keyboard focus.
@@ -85,7 +85,7 @@ When the canvas has keyboard focus it will get =keydown= events with each key pr
 
 ** Entities
 :PROPERTIES:
-:CUSTOM_ID: entities
+:CUSTOM_ID: 2-entities
 :END:
 
 I made an Entity class just like in [[https://rogueliketutorials.com/tutorials/tcod/v2/part-2/][the Python tutorial]], but with two changes:
@@ -111,14 +111,14 @@ export class Entity {
 
 ** Engine
 :PROPERTIES:
-:CUSTOM_ID: engine
+:CUSTOM_ID: 2-engine
 :END:
 
 As Python and Javascript modules act like objects, I didn't see a strong need to make an =Engine= class just yet. The fields of the Engine in the Python tutorial become module-level variables in my project. If there's a need (either to have multiple instances, or to pass it around to other modules), I'll change it later.
 
 ** Map
 :PROPERTIES:
-:CUSTOM_ID: map-storage
+:CUSTOM_ID: 2-map-storage
 :END:
 
 The [[https://rogueliketutorials.com/tutorials/tcod/v2/part-2/][Python tutorial]] for the map goes into NumPy =dtype= and =ndarray=, but I don't need that in Javascript. I'm also not planning to have FOV in this project, so I don't need the =transparent= and =dark= data. What do I actually need?
@@ -140,12 +140,12 @@ I put in some dummy data for now to test my renderer. Generating the map will be
 
 * Generating a map
 :PROPERTIES:
-:CUSTOM_ID: generating-a-map
+:CUSTOM_ID: section-3
 :END:
 
 ** Terrain generation
 :PROPERTIES:
-:CUSTOM_ID: map-terrain-generation
+:CUSTOM_ID: 3-map-terrain-generation
 :END:
 
 Since I'm making a "fortress style" game, I want the main map to be a /wilderness/ map with resources that you can use to /build/ your own settlement. What terrain do I want to start with?
@@ -186,7 +186,7 @@ I also decided that the starting point will be the west side of the map, with gr
 
 ** Scrolling
 :PROPERTIES:
-:CUSTOM_ID: map-scrolling
+:CUSTOM_ID: 3-map-scrolling
 :END:
 
 I also need to make the map a bit bigger to have room for both wilderness and building. Since the map will be bigger than what's on the screen, I need to have scrolling. Normally in a "fortress style" game you'd scroll with the mouse or with dragging, but since I still have a player character walking around, I made it scroll with the player character. To center the view on the player, wherever I'm drawing to the window with:
@@ -250,12 +250,12 @@ I think there are more fun things that I could do but I'll leave that for later.
 
 ** Building
 :PROPERTIES:
-:CUSTOM_ID: map-building
+:CUSTOM_ID: 3-map-building
 :END:
 
 *** UI
 :PROPERTIES:
-:CUSTOM_ID: building-ui-1
+:CUSTOM_ID: 3-building-ui-1
 :END:
 
 The generated map is only the wilderness. In this game the player will be building the rooms. I need to figure out the UI for that. If I had a /facing/ direction then the player could build in front of themselves. My first idea was to have you /pick up/ building materials and then /place/ them for building. But the keystrokes for that are annoying. If you want to build a wall on tiles 1, 2, 3:
@@ -294,7 +294,7 @@ Other thoughts: Should I switch to the mouse? Dragging a line or rectangle proba
 
 *** Implementation
 :PROPERTIES:
-:CUSTOM_ID: building-implementation-1
+:CUSTOM_ID: 3-building-implementation-1
 :END:
 
 I refactored the code a little bit, moving keyboard handling into its own module. It's starting to have a bit to deal with:
@@ -335,7 +335,7 @@ I implemented the beginnings of wall building but the UI is pretty rough. I need
 
 *** UI, part two
 :PROPERTIES:
-:CUSTOM_ID: building-ui-2
+:CUSTOM_ID: 3-building-ui-2
 :END:
 
 I often come up with more ideas during [[https://amitp.blogspot.com/2022/05/beer-mode-and-coffee-mode.html]["beer mode"]], a relaxed state in which I am more creative. This can happen while going for a walk, or going to sleep, or taking a shower ("shower thoughts").  I had a UI thought last night: I've been focused on building /walls/ and then the /rooms/ would come later. What if the player marked the /room/, and then the walls were calculated? I looked through my notes to see what other games did:
@@ -370,7 +370,7 @@ Of course now I need to go back and update the implementation.
 
 *** Implementation, part two
 :PROPERTIES:
-:CUSTOM_ID: building-implementation-2
+:CUSTOM_ID: 3-building-implementation-2
 :END:
 
 Fortunately I already implemented thin walls in [[href:/x/2126-roguelike-dev/][last year's r/roguelikedev project]], so I went through that and picked out some useful functions. I represent walls as a tile location and then either ~W~ for the western edge of the tile or ~N~ for the northern edge of the tile. I don't need the south or east sides, because those are the north or west sides of the next tile over. [[href:/grids/edges/][I've written about this before]] but it was last year that I got to really put it to the test, and it worked pretty well.
@@ -388,7 +388,7 @@ With thin walls, I need to change the input handling code from /drawing walls/ t
 
 Minor: I've been pretty happy with my right hand on the arrows or numpad, and the left hand on the commands (~R~ for room, ~W~ for wall). But ~Enter~ is far away from both, so I think I will change that to be a left hand command.
 
-* TODO Field of view
+* Field of view
 :PROPERTIES:
 :CUSTOM_ID: section-4
 :END:
@@ -410,9 +410,9 @@ Unfortunately the current state of the game has no NPCs (friendly or enemy) and 
 
 I want to have friendly NPCs that are performing the fortress tasks (construction, digging, crafting, farming, etc.). I think the focus here will be on /pathfinding/ and /job assignment/, both algorithm-heavy problems.  Given how far beyond a reasonable scope I am, I plan to /not/ have enemy NPCs.
 
-*** TODO Jobs
+** Jobs, attempt 1
 :PROPERTIES:
-:CUSTOM_ID: npc-jobs
+:CUSTOM_ID: 5-npc-jobs-1
 :END:
 
 NPCs need to be /assigned/ a job, and then /move/ towards the job, and then /do/ the job.
@@ -445,7 +445,7 @@ Unfortunately this conflicts with another goal I had: that each tile has at most
 
 ** TODO Resources
 :PROPERTIES:
-:CUSTOM_ID: resources
+:CUSTOM_ID: 5-resources
 :END:
 
 In addition to the /floor/ types (grass, desert, water) I also want to place objects on top: trees, stones, berries, gems. This will be useful for gathering jobs.
