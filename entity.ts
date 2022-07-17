@@ -5,23 +5,23 @@
  */
 
 import { Point } from "./map";
-export type Location = Point | string; /* could be held by an agent */
+export type AgentId = string;
+export type Location = Point | AgentId;
 export type Appearance = {sprite: string};
 
+
+/* An agent is an NPC that can move around on its own, can only be on
+ * the map, and can perform actions.
+ */
 export class Agent {
     constructor (public id: string, public location: Point, public appearance: Appearance) {
     }
-
-    moveTo(p: Point) {
-        this.location = {x: p.x, y: p.y};
-    }
 }
 
+/* An item is an object that cannot move around on its own, can be
+ * either on the ground or carried by an Agent, and cannot perform
+ * actions. */
 export class Item {
     constructor (public id: string, public location: Location, public appearance: Appearance) {
-    }
-
-    moveTo(p: Location) {
-        this.location = typeof p === 'string'? p : {x: p.x, y: p.y};
     }
 }

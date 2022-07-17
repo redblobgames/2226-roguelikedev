@@ -5,6 +5,7 @@
  */
 
 import { Point, map } from "./map";
+import * as simulation from "./simulation";
 
 let render: () => void = null;
 
@@ -13,9 +14,16 @@ export function install(canvas: HTMLCanvasElement, render_: () => void) {
     const focusInstructions = document.querySelector("#focus-instructions");
     canvas.setAttribute('tabindex', "1");
     canvas.addEventListener('keydown', handleKeyDown);
-    canvas.addEventListener('blur', () => { focusInstructions.classList.add('visible'); });
-    canvas.addEventListener('focus', () => { focusInstructions.classList.remove('visible'); });
+    canvas.addEventListener('blur', () => {
+        simulation.loop.stop();
+        focusInstructions.classList.add('visible');
+    });
+    canvas.addEventListener('focus', () => {
+        simulation.loop.start();
+        focusInstructions.classList.remove('visible');
+    });
     canvas.focus();
+    simulation.loop.start();
 
     render = render_;
 }

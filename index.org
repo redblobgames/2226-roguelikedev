@@ -401,7 +401,7 @@ I'm going to convert this game to be real-time instead of turn-based. I think th
 1. The key inputs need to be queued up and processed during the tick.
 1. I need to pay special attention to keyboard repeat. I /think/ the right way to handle this is to queue up key down/up events, ignore built-in keyboard repeat, keep track of key down/up. But it gets tricky. If you press and release ~J~ and then press and release ~K~ in the same tick, I want to process ~J~ because it happened first, but do I save ~K~ for the next tick, or discard it? And what happens if I press and release ~J~ and then press but hold ~K~? I've played games that get this kind of thing wrong, but I don't know the right way to handle it.
 
-Unfortunately the current state of the game has no NPCs (friendly or enemy) and that means nothing happens every tick. So switching to real time is not going to make a visible difference right now, and it's going to be hard to spot errors. I think I should postpone it until I have NPCs.
+Unfortunately the current state of the game has no NPCs (friendly or enemy) and that means nothing happens every tick. So switching to real time is not going to make a visible difference right now, and it's going to be hard to spot errors. I decided to postpone it until I have NPCs.
 
 * TODO Placing enemies
 :PROPERTIES:
@@ -442,6 +442,19 @@ Things I want to make sure I handle:
 - an npc dies along the way, and the job has to be reassigned
 
 Unfortunately this conflicts with another goal I had: that each tile has at most one object. The problem is that if a job is cancelled, I need to drop the object, and that might be dropped on a tile that already has an object. What to do? Either I need to allow multiple objects on a tile (and figure out how to draw them on screen), or I need to complicate how jobs are handled. And if I allow multiple objects on a tile, a 1⨉1 stockpile can hold everything, and that isn't great. But Dwarf  Fortress allows multiple objects on a tile, and stockpiles are still useful. Hm. I asked on discord and =zendarva= said to distinguish items /stored/ on a tile, and items /dropped/ on a tile. The stored items would be limited to 1, and the dropped items would be unlimited. I like this idea.
+
+*After several days of working on this* I realized that I'm stuck. I need to break this down into /much/ smaller pieces to make progress.
+
+** TODO NPC movement
+:PROPERTIES:
+:CUSTOM_ID: 5-npc-movement
+:END:
+
+I decided a much smaller piece would be to get NPCs moving around randomly, ignoring walls, but in a real time loop instead of turn-based. I know the conventional wisdom in the ECS style is to unify /everything/ but I think that goes too far for my tastes. I'm going to distinguish between /agents/ that can move around on the map and take jobs, and /items/ that can be either on the map or being carried. Both are types of entities but they'll be in separate tables with different types of attributes. I might have a third category for animals, but will figure that out later.
+
+
+
+
 
 ** TODO Resources
 :PROPERTIES:
@@ -545,6 +558,6 @@ Tools might qualify. A tool-making workshop could give NPCs tools, and then the 
 #+begin_export html
 <x:footer>
   Created 28 Jun 2022; &#160;
-  <!-- hhmts start -->Last modified: 15 Jul 2022<!-- hhmts end -->
+  <!-- hhmts start -->Last modified: 17 Jul 2022<!-- hhmts end -->
 </x:footer>
 #+end_export

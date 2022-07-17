@@ -6,7 +6,7 @@
 
 export { print } from "./console";
 import * as input from "./input";
-import { agents } from "./simulation";
+import * as simulation from "./simulation";
 import { map, Edge } from "./map";
 import { clamp } from "./util";
 
@@ -183,7 +183,7 @@ export function render() {
     ctx.lineJoin = 'bevel'; // some of the game-icons have sharp corners
     ctx.lineWidth = 1/(TILE_SIZE/512);
     ctx.strokeStyle = "black";
-    for (let agent of agents) {
+    for (let agent of simulation.agents) {
         let {x, y} = agent.location;
         if (view.left <= x && x <= view.right
             && view.top <= y && y <= view.bottom) {
@@ -201,5 +201,6 @@ export function render() {
     ctx.restore();
 }
 
+simulation.install(render);
 input.install(canvas, render);
 render();
