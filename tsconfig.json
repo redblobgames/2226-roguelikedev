@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "esnext",
+        "noImplicitThis": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "strictPropertyInitialization": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true
+    },
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "display": "Recommended"
+}

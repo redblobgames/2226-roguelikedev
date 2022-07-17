@@ -62,18 +62,18 @@ abstract class InputMode {
 }
 
 class MoveMode extends InputMode {
-    instructionsClass = 'move';
-    instructionsHtml = `Arrows to move; <kbd>R</kbd> to build room`;
+    override instructionsClass = 'move';
+    override instructionsHtml = `Arrows to move; <kbd>R</kbd> to build room`;
     key_w() { setInputMode('wall'); }
     key_r() { setInputMode('room'); }
 }
 
 class RoomMode extends InputMode {
     start: Point;
-    instructionClass = 'room';
-    instructionsHtml = `Arrows to move to opposite corner; <kbd>Enter</kbd> to mark rectangle; <kbd>Esc</kbd> to cancel`;
+    override instructionsClass = 'room';
+    override instructionsHtml = `Arrows to move to opposite corner; <kbd>Enter</kbd> to mark rectangle; <kbd>Esc</kbd> to cancel`;
     
-    constructor(public x: number, public y: number) {
+    constructor(x: number, y: number) {
         super(x, y);
         this.start = {x, y};
     }
@@ -87,7 +87,7 @@ class RoomMode extends InputMode {
         };
     }
     
-    render(drawTile) {
+    override render(drawTile) {
         let {left, right, top, bottom} = this.bounds;
         for (let y = top; y <= bottom; y++) {
             for (let x = left; x <= right; x++) {
@@ -113,9 +113,9 @@ class RoomMode extends InputMode {
 
 class WallMode extends InputMode {
     path: Point[] = [];
-    instructionClass = 'wall';
-    instructionsHtml = `Arrows to draw path; <kbd>Enter</kbd> to save; <kbd>Esc</kbd> to cancel`;
-    moved() {
+    override instructionsClass = 'wall';
+    override instructionsHtml = `Arrows to draw path; <kbd>Enter</kbd> to save; <kbd>Esc</kbd> to cancel`;
+    override moved() {
         this.path.push({x: this.x, y: this.y});
         // TODO: reversing over path should pop
         // TODO: need to draw current path

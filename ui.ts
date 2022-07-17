@@ -95,7 +95,7 @@ export function render() {
         mountain: "hsl(30, 10%, 80%)",
         river: "hsl(250, 50%, 30%)",
     };
-    function drawTile(x: number, y: number, sprite: string, color: string) {
+    function drawTile(x: number, y: number, sprite: string | null, color: string) {
         ctx.translate(x, y);
         ctx.scale(1/512, 1/512);
         ctx.stroke(sprites[sprite] ?? defaultPath);
