@@ -4,6 +4,6 @@
  * License: Apache-2.0 <http://www.apache.org/licenses/LICENSE-2.0.html>
  */
 
-import { Entity } from "./entity";
+import { Agent } from "./entity";
 
-export let entities: Entity[] = [];
+export let agents: Agent[] = [];

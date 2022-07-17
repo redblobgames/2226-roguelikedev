@@ -4,15 +4,24 @@
  * License: Apache-2.0 <http://www.apache.org/licenses/LICENSE-2.0.html>
  */
 
-export type Location = {x: number, y: number};
+import { Point } from "./map";
+export type Location = Point | string; /* could be held by an agent */
 export type Appearance = {sprite: string};
 
-export class Entity {
-    constructor (public location: Location, public appearance: Appearance) {
+export class Agent {
+    constructor (public id: string, public location: Point, public appearance: Appearance) {
     }
 
-    moveBy(dx: number, dy: number) {
-        this.location = {x: this.location.x + dx,
-                         y: this.location.y + dy};
+    moveTo(p: Point) {
+        this.location = {x: p.x, y: p.y};
+    }
+}
+
+export class Item {
+    constructor (public id: string, public location: Location, public appearance: Appearance) {
+    }
+
+    moveTo(p: Location) {
+        this.location = typeof p === 'string'? p : {x: p.x, y: p.y};
     }
 }

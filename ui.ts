@@ -6,7 +6,7 @@
 
 export { print } from "./console";
 import * as input from "./input";
-import { entities } from "./simulation";
+import { agents } from "./simulation";
 import { map, Edge } from "./map";
 import { clamp } from "./util";
 
@@ -90,10 +90,10 @@ export function render() {
 
     // Tile backgrounds
     const tileRenders = {
-        grass: "hsl(100, 30%, 50%)",
-        desert: "hsl(50, 20%, 70%)",
-        mountain: "hsl(30, 10%, 80%)",
-        river: "hsl(250, 50%, 30%)",
+        grass: ["hsl(100, 30%, 50%)", "hsl(110, 30%, 49%)", "hsl(90, 35%, 50%)", "hsl(100, 35%, 50%)"],
+        desert: ["hsl(50, 20%, 70%)", "hsl(50, 15%, 70%)", "hsl(50, 25%, 70%)", "hsl(45, 20%, 70%)"],
+        mountain: ["hsl(30, 10%, 80%)", "hsl(30, 15%, 81%)", "hsl(30, 10%, 79%)", "hsl(30, 20%, 80%)"],
+        river: ["hsl(220, 50%, 44%)", "hsl(240, 50%, 43%)", "hsl(230, 50%, 45%)", "hsl(230, 50%, 42%)"],
     };
     function drawTile(x: number, y: number, sprite: string | null, color: string) {
         ctx.translate(x, y);
@@ -110,8 +110,10 @@ export function render() {
     ctx.strokeStyle = "black";
     for (let y = view.top; y <= view.bottom; y++) {
         for (let x = view.left; x <= view.right; x++) {
+            const index = (x & 7) ^ (y & 7) ^ (((x+y) & 4) ? 0xff : 0);
             let tile = map.tiles.get({x, y});
-            let render = tileRenders[tile] ?? "red";
+            let renderCandidates = tileRenders[tile] ?? ["red"];
+            let render = renderCandidates[index % renderCandidates.length];
             drawTile(x, y, null, render);
             let object = map.objects.get({x, y});
             if (object) {
@@ -181,11 +183,11 @@ export function render() {
     ctx.lineJoin = 'bevel'; // some of the game-icons have sharp corners
     ctx.lineWidth = 1/(TILE_SIZE/512);
     ctx.strokeStyle = "black";
-    for (let entity of entities) {
-        let {x, y} = entity.location;
+    for (let agent of agents) {
+        let {x, y} = agent.location;
         if (view.left <= x && x <= view.right
             && view.top <= y && y <= view.bottom) {
-            drawTile(x, y, entity.appearance.sprite, "yellow");
+            drawTile(x, y, agent.appearance.sprite, "yellow");
         }
     }
 
