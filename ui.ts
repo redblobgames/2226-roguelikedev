@@ -47,20 +47,6 @@ export const sprites = {
     thor_hammer: S(require("./game-icons/delapouite/thor-hammer.svg")),
 };
 
-const defaultPath = new Path2D("M 0,0 l 512,0 l 0,512 l -512,0 z");
-function drawSprite(x: number, y: number, name: string | null, color="white") {
-    ctx.save();
-    ctx.translate(TILE_SIZE * x, TILE_SIZE * y);
-    ctx.scale(TILE_SIZE/512, TILE_SIZE/512);
-    ctx.lineJoin = 'bevel'; // some of the game-icons have sharp corners
-    ctx.lineWidth = 2/(TILE_SIZE/512);
-    ctx.strokeStyle = "black";
-    ctx.stroke(sprites[name] ?? defaultPath);
-    ctx.fillStyle = color;
-    ctx.fill(sprites[name] ?? defaultPath);
-    ctx.restore();
-}
-
 
 export function render() {
     const halfwidth = VIEWWIDTH / 2;
@@ -95,6 +81,7 @@ export function render() {
         mountain: ["hsl(30, 10%, 80%)", "hsl(30, 15%, 81%)", "hsl(30, 10%, 79%)", "hsl(30, 20%, 80%)"],
         river: ["hsl(220, 50%, 44%)", "hsl(240, 50%, 43%)", "hsl(230, 50%, 45%)", "hsl(230, 50%, 42%)"],
     };
+    const defaultPath = new Path2D("M 0,0 l 512,0 l 0,512 l -512,0 z");
     function drawTile(x: number, y: number, sprite: string | null, color: string) {
         ctx.translate(x, y);
         ctx.scale(1/512, 1/512);

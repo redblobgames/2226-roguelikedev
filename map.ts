@@ -11,8 +11,8 @@ export type Edge = {x: number; y: number; s: Side};
 const MAP_BOUNDS = {
     left: 0,
     top: 0,
-    right: 80,
-    bottom: 50,
+    right: 60,
+    bottom: 40,
 };
 
 // Javascript Map only takes string keys, but I want to take other types
@@ -22,10 +22,10 @@ class KeyMap<T, U> extends Map {
         super();
         this.toStr = toStr;
     }
-    get(key: T): U        { return super.get(this.toStr(key)); }
-    has(key: T): boolean  { return super.has(this.toStr(key)); }
-    set(key: T, value: U) { return super.set(this.toStr(key), value); }
-    delete(key: T)        { return super.delete(this.toStr(key)); }
+    override get(key: T): U        { return super.get(this.toStr(key)); }
+    override has(key: T): boolean  { return super.has(this.toStr(key)); }
+    override set(key: T, value: U) { return super.set(this.toStr(key), value); }
+    override delete(key: T)        { return super.delete(this.toStr(key)); }
 }
 function tileToKey(p: Point): string { return `${p.x},${p.y}`; }
 function edgeToKey(e: Edge): string { return `${e.x},${e.y},${e.s}`; }

@@ -452,9 +452,51 @@ Unfortunately this conflicts with another goal I had: that each tile has at most
 
 I decided a much smaller piece would be to get NPCs moving around randomly, ignoring walls, but in a real time loop instead of turn-based. I know the conventional wisdom in the ECS style is to unify /everything/ but I think that goes too far for my tastes. I'm going to distinguish between /agents/ that can move around on the map and take jobs, and /items/ that can be either on the map or being carried. Both are types of entities but they'll be in separate tables with different types of attributes. I might have a third category for animals, but will figure that out later.
 
+#+begin_export html
+<figure>
+  <img src="screenshots/section-5a-npc-movement.png" />
+  <figcaption>NPC chicken moving around</figcaption>
+</figure>
+#+end_export
 
+The code structure is getting in my way. I had tried splitting things up into many files like I'm "supposed" to do. But it's unclear to me at this point how I /should/ structure it, and the current structure is messy. Keyboard input triggers a render, so the keyboard needs to know about the UI. The input tracks the cursor, and the UI needs to draw the cursor, so the UI needs to know about keyboard input. The keyboard input needs to pause/resume the simulation so it knows about the simulation module. And the simulation also needs to render. The entities need to know about the map so they can decide whether a movement is in bounds. The map needs to know about entities since there are entities on the map. Lots of circular dependencies.
 
+#+begin_src dot :file screenshots/section-5b-code-structure.png
+digraph D {
+  layout=fdp
+  node [style="filled", fillcolor="#f8f8ee:#e8e8ee", gradientangle=270, color="white", fontname="Avenir,Helvetica,Arial,sans-serif" ]
+  edge [color="#b8b8be"]
+  input -> ui
+  input -> simulation
+  input -> map
+  main -> ui
+  main -> input
+  simulation -> entity
+  simulation -> map
+  simulation -> ui
+  ui -> simulation
+  ui -> input
+  ui -> map
+  entity -> map
+  map -> entity
+}
+#+end_src
 
+#+results:
+[[file:screenshots/section-5b-code-structure.png]]
+
+I probably should've left everything in one big file until I had a better sense of what structure I needed. Just as premature optimization gets in the way, premature abstraction and premature organization can also get in the way, and it's a lesson I keep failing to learn.
+
+I implemented multiple agents moving around to random destinations.
+
+#+begin_export html
+<figure>
+  <img src="screenshots/section-5b-npc-random-dest.png" />
+  <figcaption>Several chickens moving around</figcaption>
+</figure>
+#+end_export
+
+These are tiny steps but tiny amounts of progress is what I needed to get un-stuck.
 
 ** TODO Resources
 :PROPERTIES:

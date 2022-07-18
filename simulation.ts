@@ -6,14 +6,22 @@
 
 import { Agent } from "./entity";
 import { map, Point } from "./map";
+import { sign, randInt } from "./util";
 
-const TICKS_PER_SECOND = 3;
+const TICKS_PER_SECOND = 10;
+const AGENT_MOVES_PER_TICK = 3;
 export let agents: Agent[] = [];
 
-agents.push(new Agent("agent-1", {x: 5, y: 10}, {sprite: 'rooster'}));
+for (let i = 0; i < 15; i++) { // dummy agents
+    agents.push(
+        new Agent("agent-${i+1}",
+                  {x: 5 + i*3, y: 10},
+                  {sprite: 'rooster'})
+    );
+}
 
 let render: () => void = null;
-export function install(render_) {
+export function install(render_: () => void) {
     render = render_;
 }
 
@@ -25,6 +33,7 @@ function moveAgentTo(agent: Agent, p: Point) {
 
 export let loop = {
     _intervalID: 0,
+    tickId: 0,
     userPaused: false,
     systemPaused: false,
 
@@ -40,8 +49,28 @@ export let loop = {
     },
 
     tick() {
-        let agent = agents[0];
-        moveAgentTo(agent, {x: agent.location.x + 1, y: agent.location.y});
+        ++this.tickId;
+
+        const agents_per_tick = Math.min(agents.length, AGENT_MOVES_PER_TICK);
+        for (let i = 0; i < agents_per_tick; i++) {
+            let agent = agents[(this.tickId * agents_per_tick + i) % agents.length];
+            if (!agent.dest) {
+                agent.dest = {
+                    x: randInt(map.bounds.left, map.bounds.right),
+                    y: randInt(map.bounds.top, map.bounds.bottom)
+                };
+            }
+
+            let dx = agent.dest.x - agent.location.x;
+            let dy = agent.dest.y - agent.location.y;
+            if (dx === 0 && dy === 0) {
+                agent.dest = null
+            } else {
+                dx = sign(dx);
+                dy = sign(dy);
+                moveAgentTo(agent, {x: agent.location.x + dx, y: agent.location.y + dy});
+            }
+        }
         render();
     }
 };

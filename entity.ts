@@ -14,7 +14,10 @@ export type Appearance = {sprite: string};
  * the map, and can perform actions.
  */
 export class Agent {
-    constructor (public id: string, public location: Point, public appearance: Appearance) {
+    dest: Point | null = null;
+    constructor (public id: string,
+                 public location: Point,
+                 public appearance: Appearance) {
     }
 }
 
