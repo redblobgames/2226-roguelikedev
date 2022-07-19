@@ -42,6 +42,7 @@ export const sprites = {
     grass:      S(require("./game-icons/delapouite/grass.svg")),
     wheat:      S(require("./game-icons/lorc/wheat.svg")),
     wall:       S(require("./game-icons/delapouite/stone-wall.svg")),
+    baobab:     S(require("./game-icons/delapouite/baobab.svg")),
     door:       S(require("./game-icons/delapouite/door.svg")),
     move:       S(require("./game-icons/delapouite/move.svg")),
     thor_hammer: S(require("./game-icons/delapouite/thor-hammer.svg")),
@@ -77,8 +78,8 @@ export function render() {
     // Tile backgrounds
     const tileRenders = {
         grass: ["hsl(100, 30%, 50%)", "hsl(110, 30%, 49%)", "hsl(90, 35%, 50%)", "hsl(100, 35%, 50%)"],
+        plains: ["hsl(80, 30%, 60%)", "hsl(90, 35%, 61%)", "hsl(70, 40%, 59%)", "hsl(80, 40%, 60%)"],
         desert: ["hsl(50, 20%, 70%)", "hsl(50, 15%, 70%)", "hsl(50, 25%, 70%)", "hsl(45, 20%, 70%)"],
-        mountain: ["hsl(30, 10%, 80%)", "hsl(30, 15%, 81%)", "hsl(30, 10%, 79%)", "hsl(30, 20%, 80%)"],
         river: ["hsl(220, 50%, 44%)", "hsl(240, 50%, 43%)", "hsl(230, 50%, 45%)", "hsl(230, 50%, 42%)"],
     };
     const defaultPath = new Path2D("M 0,0 l 512,0 l 0,512 l -512,0 z");
@@ -102,9 +103,9 @@ export function render() {
             let renderCandidates = tileRenders[tile] ?? ["red"];
             let render = renderCandidates[index % renderCandidates.length];
             drawTile(x, y, null, render);
-            let object = map.objects.get({x, y});
-            if (object) {
-                drawTile(x, y, object, "white"); // TODO: need to figure out colors, sizes
+            let resource = map.resources.get({x, y});
+            if (resource) {
+                drawTile(x, y, resource.appearance.sprite, "green"); // TODO: need to figure out colors, sizes
             }
         }
     }

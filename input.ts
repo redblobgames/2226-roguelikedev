@@ -125,6 +125,7 @@ class RoomMode extends InputMode {
     }
 }
 
+/*
 class WallMode extends InputMode {
     path: Point[] = [];
     override instructionsClass = 'wall';
@@ -142,11 +143,11 @@ class WallMode extends InputMode {
         setInputMode('move');
     }
 }
-
+*/
 
 export let current: InputMode = new MoveMode(5, 5);
 export function setInputMode(mode: 'move' | 'room' | 'wall') {
-    current = new {move: MoveMode, room: RoomMode, wall: WallMode}[mode](current.x, current.y);
+    current = new {move: MoveMode, room: RoomMode}[mode](current.x, current.y);
     render();
 }
 

@@ -4,6 +4,9 @@
  * License: Apache-2.0 <http://www.apache.org/licenses/LICENSE-2.0.html>
  */
 
+import { randInt } from "./util";
+import { Resource } from "./entity";
+
 export type Point = {x: number, y: number};
 export type Side = 'W' | 'N';
 export type Edge = {x: number; y: number; s: Side};
@@ -30,10 +33,9 @@ class KeyMap<T, U> extends Map {
 function tileToKey(p: Point): string { return `${p.x},${p.y}`; }
 function edgeToKey(e: Edge): string { return `${e.x},${e.y},${e.s}`; }
 
-type TileType = 'grass' | 'river' | 'desert' | 'mountain';
+type TileType = 'grass' | 'river' | 'plains' | 'desert';
 type TileMap = KeyMap<Point, TileType>;
-type ObjectType = 'tree' | 'wall';
-type ObjectMap = KeyMap<Point, ObjectType>;
+type ResourceMap = KeyMap<Point, Resource>;
 type EdgeData = 'wall' | 'door';
 type EdgeMap = KeyMap<Edge, EdgeData>;
 
@@ -72,7 +74,7 @@ type Room = {
 export class GameMap {
     bounds = MAP_BOUNDS;
     tiles: TileMap = new KeyMap(tileToKey);
-    objects: ObjectMap = new KeyMap(tileToKey);
+    resources: ResourceMap = new KeyMap(tileToKey);
     edges: EdgeMap = new KeyMap(edgeToKey);
     
     nextRoomId = 1;
@@ -94,21 +96,26 @@ export class GameMap {
         }
         
         let riverX = 10;
-        let desertStart = 20;
-        let desertWidth = 10;
+        let plainsStart = 20;
+        let plainsWidth = 10;
         for (let y = top; y <= bottom; y++) {
             riverX = Math.max(3, tweakNumber(riverX));
-            desertStart = Math.max(5, tweakNumber(desertStart));
-            desertWidth = Math.max(3, tweakNumber(desertWidth));
+            plainsStart = Math.max(5, tweakNumber(plainsStart));
+            plainsWidth = Math.max(3, tweakNumber(plainsWidth));
             
             for (let x = left; x <= right; x++) {
                 let tileType: TileType =
                     x < riverX ? 'grass'
                     : x < riverX+2 ? 'river'
-                    : x < riverX + desertStart ? 'grass'
-                    : x < riverX + desertStart + desertWidth ? 'desert'
-                    : 'mountain';
+                    : x < riverX + plainsStart ? 'grass'
+                    : x < riverX + plainsStart + plainsWidth ? 'plains'
+                    : 'desert';
                 this.tiles.set({x, y}, tileType);
+                if (tileType === 'grass' && randInt(1, 100) <= 20) {
+                    this.resources.set({x, y}, new Resource(`berry-plant-${x},${y}`, {x, y}, {sprite: 'grass'}));
+                } else if (tileType === 'plains' && randInt(1, 100) <= 20) {
+                    this.resources.set({x, y}, new Resource(`tree-${x},${y}`, {x, y}, {sprite: 'baobab'}));
+                }
             }
         }
     }

@@ -15,6 +15,16 @@ export type Appearance = {sprite: string};
  */
 export class Agent {
     dest: Point | null = null;
+    fed: number = 100;
+    constructor (public id: string,
+                 public location: Point,
+                 public appearance: Appearance) {
+    }
+}
+
+/* A resource is something on the ground that cannot move or be moved. */
+export class Resource {
+    growth: number = 0;
     constructor (public id: string,
                  public location: Point,
                  public appearance: Appearance) {
@@ -25,6 +35,8 @@ export class Agent {
  * either on the ground or carried by an Agent, and cannot perform
  * actions. */
 export class Item {
-    constructor (public id: string, public location: Location, public appearance: Appearance) {
+    constructor (public id: string,
+                 public location: Location,
+                 public appearance: Appearance) {
     }
 }

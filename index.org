@@ -445,7 +445,7 @@ Unfortunately this conflicts with another goal I had: that each tile has at most
 
 *After several days of working on this* I realized that I'm stuck. I need to break this down into /much/ smaller pieces to make progress.
 
-** TODO NPC movement
+** NPC movement
 :PROPERTIES:
 :CUSTOM_ID: 5-npc-movement
 :END:
@@ -487,7 +487,7 @@ digraph D {
 
 I probably should've left everything in one big file until I had a better sense of what structure I needed. Just as premature optimization gets in the way, premature abstraction and premature organization can also get in the way, and it's a lesson I keep failing to learn.
 
-I implemented multiple agents moving around to random destinations.
+I placed a handful of agents in the world and implemented them moving around to random destinations.
 
 #+begin_export html
 <figure>
@@ -498,12 +498,76 @@ I implemented multiple agents moving around to random destinations.
 
 These are tiny steps but tiny amounts of progress is what I needed to get un-stuck.
 
+This made me think about pathfinding a bit. Right now they move in straight lines, but ideally they would use pathfinding so that they don't walk through walls. But what if there's a room with no doors? I'd need to figure that out so that the agent stops trying to walk into it.
+
+In games we can often redesign some rules to /avoid/ a messy situation. And that made me wonder if I can avoid that messy pathfinding situation. I think I can, with two changes:
+
+1. Walls need to be built/destroyed instantaneously. The time after a room has been built but before the walls have been updated creates a lot of "churn" that is going to require frequent repathing.
+1. Room editing needs to ensure that every room has a door to the outside or to another room that has a path to the outside.
+
+On one hand, I was /excited/ about rooms being built wall by wall. I think it looks cool and it also creates a source of jobs for the NPCs. On the other hand, it adds a lot of complexity, and I need to cut back as much as I can on this project. So what if I make rooms insta-build but move the focus of my jobs to other things? I think it'll be less cool of a game, but more likely that I can keep to the schedule. And since the scope my biggest problem right now, I think, sadly, I will probably give up on room building tile by tile.
+
+And that means I can work on NPC jobs without dealing with rooms. I'll implement outdoor jobs for now, and get back to rooms later.
+
 ** TODO Resources
 :PROPERTIES:
 :CUSTOM_ID: 5-resources
 :END:
 
-In addition to the /floor/ types (grass, desert, water) I also want to place objects on top: trees, stones, berries, gems. This will be useful for gathering jobs.
+In addition to the /floor/ types (grass, desert, water) I also want to place objects on top: trees, stones, berries, gems. This will be useful for gathering jobs, especially if I don't have building jobs. Which of these jobs makes the most sense right /now/, since I don't have room building? I think trees and stones are out. Let me work on berries. Food is a rewewable job type, so the NPCs will always have something to do.
+
+1. Berries grow in the grasslands. I want them to re-grow too, so that means I need to have some kind of growth clock. Maybe it starts out as =growth= 0 and goes up over time. When the berry gets eaten it goes back to 0. I'll want to display this visually somehow, maybe with size or color.
+1. NPCs periodically pick a nearby berry to eat. "Periodically"? I think that means I need to add a hunger clock of sorts. Maybe it =fed= starts out as 100 and goes down over time. When it gets below 30 the NPC can go look for food. And when they eat food it can go up +50.
+
+What do I need to make this happen?
+
+1. I need to implement /Resources/. An resource is similar to an Agent, but doesn't move around, and cannot be moved. I will also at some point need /Items/. An item is similar to an Agent or Resource, but /can/ be moved, or carried. A berry /plant/ would be a Resource. A berry would be an Item that you can get from a berry plant. But for now, I will only have Resources, and NPCs will directly eat from there.
+1. Berry plants will need a =growth= value. In an ECS this would probably be a Growable component. I'm using union types instead so I'll structure it a little differently.
+1. Agents will need a =fed= value.
+1. Simulation ticks should periodically increase =growth= on plants and decrease =fed= on agents.
+1. Simulation ticks should periodically evaluate NPCs to see if they need to eat. If they do, find a nearby berry plant and reserve it (this is the job system I described earlier, without the complicated cancellation system), and then pathfind to it, then eat the berry.
+
+Agents, Resources, and Items sure are similar though. I can see why it might be useful to call them all Entity and treat them the same. There are sometimes tradeoffs in type systems between precision and convenience. For example, should /meters/ be the same type as /grams/? If I'm purely going for type safety, then no. But in practice? They're both =double= in my code. So I'm going to start out with these three being separate types, but I might change my mind later and merge them. Or maybe I'll change them to Typescript's union types. It depends on how I end up using these, and I can't see that far into the future so I'll do something to make it work /now/ and then plan to change it later.
+
+#+begin_src typescript
+/* An agent is an NPC that can move around on its own, can only be on
+ * the map, and can perform actions.
+ */
+class Agent {
+    dest: Point | null = null;
+    fed: number = 100;
+    constructor (public id: string,
+                 public location: Point,
+                 public appearance: Appearance) {
+    }
+}
+
+/* A resource is something on the ground that cannot move or be moved. */
+class Resource {
+    growth: number = 0;
+    constructor (public id: string,
+                 public location: Point,
+                 public appearance: Appearance) {
+    }
+}
+
+/* An item is an object that cannot move around on its own, can be
+ * either on the ground or carried by an Agent, and cannot perform
+ * actions. */
+class Item {
+    constructor (public id: string,
+                 public location: Location,
+                 public appearance: Appearance) {
+    }
+}
+#+end_src
+
+#+begin_export html
+<figure>
+  <img src="screenshots/section-5c-resources.png" />
+  <figcaption>Resources abound</figcaption>
+</figure>
+#+end_export
 
 
 * TODO Combat
@@ -558,6 +622,8 @@ Room types: bedroom, dining, kitchen, indoor storage, outdoor storage, farms, ra
 
 I have gotten rid of the player character so there's no player inventory. But the NPCs could be carrying things. And there are things on the map. I think I need to figure out /stockpiles/ and also NPC inventory. The simplest thing would be for NPCs to carry only one thing at a time, or only as much as is needed for the current job.
 
+I need to revisit rooms. I think some rooms will have walls and some will not. Rooms with walls need doors. I need pathfinding to not take NPCs through walls. I'd like non-rectangular rooms but that might be something to add later. Do rooms have floors? What happens to trees and plants when you place a room somewhere? *What are the room types, and what are they for?*
+
 * TODO Ranged scrolls and targeting
 :PROPERTIES:
 :CUSTOM_ID: section-9
@@ -600,6 +666,6 @@ Tools might qualify. A tool-making workshop could give NPCs tools, and then the 
 #+begin_export html
 <x:footer>
   Created 28 Jun 2022; &#160;
-  <!-- hhmts start -->Last modified: 17 Jul 2022<!-- hhmts end -->
+  <!-- hhmts start -->Last modified: 18 Jul 2022<!-- hhmts end -->
 </x:footer>
 #+end_export
