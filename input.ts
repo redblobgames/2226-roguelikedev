@@ -14,16 +14,22 @@ export function install(canvas: HTMLCanvasElement, render_: () => void) {
     const focusInstructions = document.querySelector("#focus-instructions");
     canvas.setAttribute('tabindex', "1");
     canvas.addEventListener('keydown', handleKeyDown);
-    canvas.addEventListener('blur', () => {
-        simulation.loop.stop();
-        focusInstructions.classList.add('visible');
-    });
-    canvas.addEventListener('focus', () => {
+
+    function start() {
         simulation.loop.start();
         focusInstructions.classList.remove('visible');
-    });
+    }
+    function stop() {
+        simulation.loop.stop();
+        focusInstructions.classList.add('visible');
+    }
+    canvas.addEventListener('blur', stop);
+    canvas.addEventListener('focus', start);
     canvas.focus();
-    simulation.loop.start();
+
+    // Initial focus state depends on the canvas having focus AND the
+    // document having focus:
+    (document.hasFocus()? start : stop)();
 
     render = render_;
 }
