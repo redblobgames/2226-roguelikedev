@@ -5,6 +5,7 @@
  */
 
 import { Point } from "./map";
+import { randInt } from "./util";
 export type AgentId = string;
 export type Location = Point | AgentId;
 export type Appearance = {sprite: string};
@@ -28,6 +29,7 @@ export class Resource {
     constructor (public id: string,
                  public location: Point,
                  public appearance: Appearance) {
+        this.growth = randInt(0, 100);
     }
 }
 

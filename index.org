@@ -562,6 +562,8 @@ class Item {
 }
 #+end_src
 
+I'm going to split this work up into two parts. First, I'll place Resources.
+
 #+begin_export html
 <figure>
   <img src="screenshots/section-5c-resources.png" />
@@ -569,13 +571,34 @@ class Item {
 </figure>
 #+end_export
 
+Then I need to periodically go through all the plants/trees and make the grow.
+
+A thought: my desire to keep everything fast is getting in my way. Premature optimization? No, I am /sure/ I need to optimize this. But still, it's getting in my way. In particular, I often want to build an /index/:
+
+- NPCs have a job, jobs point to their NPCs, jobs point to their items, items point to their jobs.  I was trying to make the reverse pointers to avoid looking things up slowly. But it'd be much simpler if I made a single array of jobs that point to their NPCs /and/ their items. I can scan the entire list every time.
+- Maps have resources. Resources have locations on the map. Each location on the map has a list of resources. But it'd be much simpler if I kept just one of these and then scan the data structure for the reverse lookup.
+
+This kind of thing happens a lot. I find it's simpler if I say that /one/ of the directions is "primary", and the others are "derived". Then there's a question of whether to keep the derived information up-to-date when updating the primary (slower but always up to date), or to rebuild the derived information occasionally (faster but can be out of date). I think I'm at the point where I should be focused on only the primary direction. I need to figure out /whether it's even the right data/ before I spend time trying to make it fast. Things like this make me wish in-memory databases were more commonplace in programming languages.
+
+Anyway, back to growing plants. I'll scan the map and increase =growth= every so often.
+
+#+begin_export html
+<figure>
+  <img src="screenshots/section-5d-resources-grow.png" />
+  <figcaption>Resources grow over time</figcaption>
+</figure>
+#+end_export
+
+Next week, I'll work on the job system where NPCs look for resources.
 
 * TODO Combat
 :PROPERTIES:
 :CUSTOM_ID: section-6
 :END:
 
-I won't have enemy NPCs, so I don't need combat, right? But there might be some limited combat in the form of hunting for food. Given how the scope is too large, I should probably drop hunting combat from the list. If I have hunting, it could be that when the NPC reaches the animal, the animal dies and turns into food. That will put some more stress on the pathfinding system, but at least it's using an existing system instead of me having to write a new one.
+I don't have enemies. I have allies. I considered some limited combat in the form of hunting for food, but I need to keep the scope of this project down, so no hunting. Instead, this week I will work on the job system. Initially, the jobs will be to eat food when hungry, as described in the previous section.
+
+In RimWorld and Two Point Hospital, the job objects reserve space for standing. I think that's a good idea, but I don't yet have job objects (carpenter table, kitchen stove, etc.).
 
 * TODO Interface
 :PROPERTIES:
@@ -612,8 +635,12 @@ So what systems could I implement? With the big caveat that I won't time for all
 - Building: wood, stone, metal
 - Recreation: games, paintings, sculptures, library
 
-Room types: bedroom, dining, kitchen, indoor storage, outdoor storage, farms, ranches, workshops of various sorts, recreation.
+Possible room types: bedroom, dining, kitchen, indoor storage, outdoor storage, farms, ranches, workshops of various sorts, recreation.
 
+I don't think I'll get far enough this project to build most of the ideas I've described in this section. However, there are two I need:
+
+- Rooms: I have implemented an interface for room building, but it needs more polish, needs a way to specify the type, needs a way to add doors, and needs to handle room collision. Alternatively, I could separate room and zone marking, and make rooms much simpler (always have walls and doors, don't have a type, doesn't matter if they collide) and also make zones simpler (never have walls or doors, and always have a type, never collide).
+- Objects: I need to implement an interface for placing objects. I also need to deal with objects that are more than 1⨉1 tile. And I need to figure out what happens if you change a room or zone to cut an object in two.
 
 * TODO Items and inventory
 :PROPERTIES:
@@ -622,23 +649,21 @@ Room types: bedroom, dining, kitchen, indoor storage, outdoor storage, farms, ra
 
 I have gotten rid of the player character so there's no player inventory. But the NPCs could be carrying things. And there are things on the map. I think I need to figure out /stockpiles/ and also NPC inventory. The simplest thing would be for NPCs to carry only one thing at a time, or only as much as is needed for the current job.
 
-I need to revisit rooms. I think some rooms will have walls and some will not. Rooms with walls need doors. I need pathfinding to not take NPCs through walls. I'd like non-rectangular rooms but that might be something to add later. Do rooms have floors? What happens to trees and plants when you place a room somewhere? *What are the room types, and what are they for?*
+The bigger topic this week is that I need to revisit rooms. I think some rooms will have walls and some will not. Rooms with walls need doors. I need pathfinding to not take NPCs through walls. I'd like non-rectangular rooms but that might be something to add later. Do rooms have floors? What happens to trees and plants when you place a room somewhere? *What are the room types, and what are they for?*
 
 * TODO Ranged scrolls and targeting
 :PROPERTIES:
 :CUSTOM_ID: section-9
 :END:
 
-I think given how I'm biting off more than I can chew, I won't get around to combat, and I won't have scrolls or targeting. But I do want to have multiple types of jobs, including harvesting and farming, so maybe I can do that in this section.
-
-In RimWorld and Two Point Hospital, the job objects reserve space for standing. I think that's a good idea.
+I won't have scrolls or targeting. Instead, I need to figure out pathfinding. I have a bunch of ideas for making it fast, but I need to get all of that /out/ of my brain and first make pathfinding work at all, even if it's slow.
 
 * TODO Saving and loading
 :PROPERTIES:
 :CUSTOM_ID: section-10
 :END:
 
-I am planning to skip this. It's not hard, but it's not something I'm interested in spending my time on for this project.
+I am planning to skip this. It's not hard, but it's not something I'm interested in spending my time on for this project. I need to keep the scope down for my first fortress style game, and can revisit this the next time I work on a game like this.
 
 * TODO Dungeon levels
 :PROPERTIES:
@@ -666,6 +691,6 @@ Tools might qualify. A tool-making workshop could give NPCs tools, and then the 
 #+begin_export html
 <x:footer>
   Created 28 Jun 2022; &#160;
-  <!-- hhmts start -->Last modified: 18 Jul 2022<!-- hhmts end -->
+  <!-- hhmts start -->Last modified: 20 Jul 2022<!-- hhmts end -->
 </x:footer>
 #+end_export

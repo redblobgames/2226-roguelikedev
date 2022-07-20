@@ -105,7 +105,9 @@ export function render() {
             drawTile(x, y, null, render);
             let resource = map.resources.get({x, y});
             if (resource) {
-                drawTile(x, y, resource.appearance.sprite, "green"); // TODO: need to figure out colors, sizes
+                let growth = resource.growth/100;
+                let color = `hsl(${60+60*growth|0},${20+80*growth|0}%,50%)`;
+                drawTile(x, y, resource.appearance.sprite, color);
             }
         }
     }

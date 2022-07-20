@@ -10,6 +10,8 @@ import { sign, randInt } from "./util";
 
 const TICKS_PER_SECOND = 10;
 const AGENT_MOVES_PER_TICK = 3;
+const TICKS_PER_PLANT_GROWTH = 10;
+
 export let agents: Agent[] = [];
 
 for (let i = 0; i < 15; i++) { // dummy agents
@@ -28,6 +30,42 @@ export function install(render_: () => void) {
 function moveAgentTo(agent: Agent, p: Point) {
     if (map.inBounds(p)) {
         agent.location = {x: p.x, y: p.y};
+    }
+}
+
+function agentsMove(tickId) {
+    const agents_per_tick = Math.min(agents.length, AGENT_MOVES_PER_TICK);
+    for (let i = 0; i < agents_per_tick; i++) {
+        let agent = agents[(tickId * agents_per_tick + i) % agents.length];
+        if (!agent.dest) {
+            agent.dest = {
+                x: randInt(map.bounds.left, map.bounds.right),
+                y: randInt(map.bounds.top, map.bounds.bottom)
+            };
+        }
+
+        let dx = agent.dest.x - agent.location.x;
+        let dy = agent.dest.y - agent.location.y;
+        if (dx === 0 && dy === 0) {
+            agent.dest = null
+        } else {
+            dx = sign(dx);
+            dy = sign(dy);
+            moveAgentTo(agent, {x: agent.location.x + dx, y: agent.location.y + dy});
+        }
+    }
+}
+
+function plantsGrow(tickId) {
+    if (tickId % TICKS_PER_PLANT_GROWTH !== 0) return;
+    
+    // NOTE: make this faster by adding a queue/index of non-growth-100 plants
+    const {left, top, right, bottom} = map.bounds;
+    for (let y = top; y <= bottom; y++) {
+        for (let x = left; x <= right; x++) {
+            let resource = map.resources.get({x, y});
+            if (resource && resource.growth < 100) resource.growth++;
+        }
     }
 }
 
@@ -51,26 +89,9 @@ export let loop = {
     tick() {
         ++this.tickId;
 
-        const agents_per_tick = Math.min(agents.length, AGENT_MOVES_PER_TICK);
-        for (let i = 0; i < agents_per_tick; i++) {
-            let agent = agents[(this.tickId * agents_per_tick + i) % agents.length];
-            if (!agent.dest) {
-                agent.dest = {
-                    x: randInt(map.bounds.left, map.bounds.right),
-                    y: randInt(map.bounds.top, map.bounds.bottom)
-                };
-            }
-
-            let dx = agent.dest.x - agent.location.x;
-            let dy = agent.dest.y - agent.location.y;
-            if (dx === 0 && dy === 0) {
-                agent.dest = null
-            } else {
-                dx = sign(dx);
-                dy = sign(dy);
-                moveAgentTo(agent, {x: agent.location.x + dx, y: agent.location.y + dy});
-            }
-        }
+        agentsMove(this.tickId);
+        plantsGrow(this.tickId);
+        
         render();
     }
 };
