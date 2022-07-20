@@ -92,14 +92,18 @@ export function render() {
         ctx.scale(512, 512);
         ctx.translate(-x, -y);
     }
+    function animationIndex(x: number, y: number): number {
+        return (x & 7) ^ (y & 7) ^ (((x+y) & 4) ? 0xff : 0);
+    }
+    
     ctx.save();
     ctx.lineJoin = 'bevel'; // some of the game-icons have sharp corners
     ctx.lineWidth = 1/(TILE_SIZE/512);
     ctx.strokeStyle = "black";
     for (let y = view.top; y <= view.bottom; y++) {
         for (let x = view.left; x <= view.right; x++) {
-            const index = (x & 7) ^ (y & 7) ^ (((x+y) & 4) ? 0xff : 0);
             let tile = map.tiles.get({x, y});
+            let index = animationIndex(x, y - (tile !== 'river'? 0 : Math.floor(simulation.loop.tickId/simulation.TICKS_PER_SECOND)));
             let renderCandidates = tileRenders[tile] ?? ["red"];
             let render = renderCandidates[index % renderCandidates.length];
             drawTile(x, y, null, render);

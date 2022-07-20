@@ -8,9 +8,9 @@ import { Agent } from "./entity";
 import { map, Point } from "./map";
 import { sign, randInt } from "./util";
 
-const TICKS_PER_SECOND = 10;
-const AGENT_MOVES_PER_TICK = 3;
-const TICKS_PER_PLANT_GROWTH = 10;
+export const TICKS_PER_SECOND = 10;
+export const AGENT_MOVES_PER_TICK = 3;
+export const TICKS_PER_PLANT_GROWTH = 10;
 
 export let agents: Agent[] = [];
 
