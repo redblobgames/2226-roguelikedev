@@ -111,10 +111,10 @@ export class GameMap {
                     : x < riverX + plainsStart + plainsWidth ? 'plains'
                     : 'desert';
                 this.tiles.set({x, y}, tileType);
-                if (tileType === 'grass' && randInt(1, 100) <= 20) {
-                    this.resources.set({x, y}, new Resource(`berry-plant-${x},${y}`, {x, y}, {sprite: 'grass'}));
+                if (tileType === 'grass' && randInt(1, 100) <= 5) {
+                    this.resources.set({x, y}, new Resource(`berry-plant-${x},${y}`, {x, y}, {sprite: 'sprout'}));
                 } else if (tileType === 'plains' && randInt(1, 100) <= 20) {
-                    this.resources.set({x, y}, new Resource(`tree-${x},${y}`, {x, y}, {sprite: 'baobab'}));
+                    this.resources.set({x, y}, new Resource(`tree-${x},${y}`, {x, y}, {sprite: 'cactus'}));
                 }
             }
         }

@@ -42,9 +42,10 @@ export const sprites = {
     grass:      S(require("./game-icons/delapouite/grass.svg")),
     wheat:      S(require("./game-icons/lorc/wheat.svg")),
     wall:       S(require("./game-icons/delapouite/stone-wall.svg")),
-    baobab:     S(require("./game-icons/delapouite/baobab.svg")),
+    cactus:     S(require("./game-icons/delapouite/cactus.svg")),
     door:       S(require("./game-icons/delapouite/door.svg")),
     move:       S(require("./game-icons/delapouite/move.svg")),
+    sprout:     S(require("./game-icons/lorc/sprout.svg")),
     thor_hammer: S(require("./game-icons/delapouite/thor-hammer.svg")),
 };
 
@@ -110,7 +111,8 @@ export function render() {
             let resource = map.resources.get({x, y});
             if (resource) {
                 let growth = resource.growth/100;
-                let color = `hsl(${60+60*growth|0},${20+80*growth|0}%,50%)`;
+                let color = `hsl(${60+60*growth|0},${50*growth|0}%,50%)`;
+                if (resource.growth > simulation.PLANT_EDIBLE) color = "green";
                 drawTile(x, y, resource.appearance.sprite, color);
             }
         }
@@ -172,7 +174,7 @@ export function render() {
     
     // TODO: tile foregrounds
     
-    // Entities
+    // Agents are drawn on top of most everything else (except the cursor)
     ctx.save();
     ctx.lineJoin = 'bevel'; // some of the game-icons have sharp corners
     ctx.lineWidth = 1/(TILE_SIZE/512);
@@ -181,7 +183,12 @@ export function render() {
         let {x, y} = agent.location;
         if (view.left <= x && x <= view.right
             && view.top <= y && y <= view.bottom) {
-            drawTile(x, y, agent.appearance.sprite, "yellow");
+            let color = "yellow";
+            if (agent.fed < simulation.AGENT_HUNGRY) color = "orange";
+            if (agent.fed < simulation.AGENT_STARVING) color = "red";
+            if (agent.fed === 0) color = "black";
+            if (agent.fed < 0) color = "purple"; // debugging
+            drawTile(x, y, agent.appearance.sprite, color);
         }
     }
 

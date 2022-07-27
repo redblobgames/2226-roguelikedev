@@ -11,6 +11,11 @@ import { sign, randInt } from "./util";
 export const TICKS_PER_SECOND = 10;
 export const AGENT_MOVES_PER_TICK = 3;
 export const TICKS_PER_PLANT_GROWTH = 10;
+export const TICKS_PER_AGENT_HUNGER = 5;
+
+export const PLANT_EDIBLE = 70;
+export const AGENT_HUNGRY = 40;
+export const AGENT_STARVING = 20;
 
 export let agents: Agent[] = [];
 
@@ -37,6 +42,10 @@ function agentsMove(tickId) {
     const agents_per_tick = Math.min(agents.length, AGENT_MOVES_PER_TICK);
     for (let i = 0; i < agents_per_tick; i++) {
         let agent = agents[(tickId * agents_per_tick + i) % agents.length];
+        if (agent.fed === 0) { // no food, dead
+            return;
+        }
+        
         if (!agent.dest) {
             agent.dest = {
                 x: randInt(map.bounds.left, map.bounds.right),
@@ -52,6 +61,24 @@ function agentsMove(tickId) {
             dx = sign(dx);
             dy = sign(dy);
             moveAgentTo(agent, {x: agent.location.x + dx, y: agent.location.y + dy});
+        }
+    }
+}
+
+function agentsGetHungry(tickId) {
+    if (tickId % TICKS_PER_AGENT_HUNGER !== 0) return;
+
+    for (let agent of agents) {
+        if (agent.fed > 0) agent.fed--;
+        if (agent.fed < AGENT_HUNGRY) {
+            // consider eating
+            let resource = map.resources.get(agent.location);
+            // TODO: check if it's a food resource
+            if (resource && resource.growth > PLANT_EDIBLE) {
+                let meal = Math.min(30, 100-agent.fed);
+                agent.fed += meal;
+                resource.growth -= meal;
+            }
         }
     }
 }
@@ -89,8 +116,9 @@ export let loop = {
     tick() {
         ++this.tickId;
 
-        agentsMove(this.tickId);
-        plantsGrow(this.tickId);
+        for (let system of [agentsMove, plantsGrow, agentsGetHungry]) {
+            system(this.tickId);
+        }
         
         render();
     }

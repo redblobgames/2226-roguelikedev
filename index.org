@@ -403,7 +403,7 @@ I'm going to convert this game to be real-time instead of turn-based. I think th
 
 Unfortunately the current state of the game has no NPCs (friendly or enemy) and that means nothing happens every tick. So switching to real time is not going to make a visible difference right now, and it's going to be hard to spot errors. I decided to postpone it until I have NPCs.
 
-* TODO Placing enemies
+* Placing enemies
 :PROPERTIES:
 :CUSTOM_ID: section-5
 :END:
@@ -487,6 +487,14 @@ digraph D {
 
 I probably should've left everything in one big file until I had a better sense of what structure I needed. Just as premature optimization gets in the way, premature abstraction and premature organization can also get in the way, and it's a lesson I keep failing to learn.
 
+#+begin_quote
+No one is ever going to see your first draft. Nobody cares about your first draft. And that’s the thing that you may be agonizing over, but honestly, whatever you’re doing can be fixed. …
+
+For now, just get the words out. Get the story down however you can get it down, then fix it.
+
+—Neil Gaiman
+#+end_quote
+
 I placed a handful of agents in the world and implemented them moving around to random destinations.
 
 #+begin_export html
@@ -509,7 +517,7 @@ On one hand, I was /excited/ about rooms being built wall by wall. I think it lo
 
 And that means I can work on NPC jobs without dealing with rooms. I'll implement outdoor jobs for now, and get back to rooms later.
 
-** TODO Resources
+** Resources
 :PROPERTIES:
 :CUSTOM_ID: 5-resources
 :END:
@@ -571,9 +579,9 @@ I'm going to split this work up into two parts. First, I'll place Resources.
 </figure>
 #+end_export
 
-Then I need to periodically go through all the plants/trees and make the grow.
+Then I need to periodically go through all the plants/trees and make them grow.
 
-A thought: my desire to keep everything fast is getting in my way. Premature optimization? No, I am /sure/ I need to optimize this. But still, it's getting in my way. In particular, I often want to build an /index/:
+A thought: my desire to keep everything fast is getting in my way. Premature optimization? No, I am /sure/ I will need to optimize this. But still, it's getting in my way. In particular, I often want to build an /index/:
 
 - NPCs have a job, jobs point to their NPCs, jobs point to their items, items point to their jobs.  I was trying to make the reverse pointers to avoid looking things up slowly. But it'd be much simpler if I made a single array of jobs that point to their NPCs /and/ their items. I can scan the entire list every time.
 - Maps have resources. Resources have locations on the map. Each location on the map has a list of resources. But it'd be much simpler if I kept just one of these and then scan the data structure for the reverse lookup.
@@ -597,6 +605,15 @@ Next week, I'll work on the job system where NPCs look for resources.
 :END:
 
 I don't have enemies. I have allies. I considered some limited combat in the form of hunting for food, but I need to keep the scope of this project down, so no hunting. Instead, this week I will work on the job system. Initially, the jobs will be to eat food when hungry, as described in the previous section.
+
+I broke this down into smaller parts. First, I wanted the agents to eat when they're hungry *and* they're standing on food.
+
+#+begin_export html
+<figure>
+  <img src="screenshots/section-6a-hungry-chickens.png" />
+  <figcaption>Chickens get hungry (orange, red) and die (black)</figcaption>
+</figure>
+#+end_export
 
 In RimWorld and Two Point Hospital, the job objects reserve space for standing. I think that's a good idea, but I don't yet have job objects (carpenter table, kitchen stove, etc.).
 
@@ -689,8 +706,14 @@ Tools might qualify. A tool-making workshop could give NPCs tools, and then the 
 * TODO Conclusion
 
 #+begin_export html
+<style>
+blockquote { font-size: 75%; line-height: 1.5; padding: 0 2em; }
+blockquote p { margin: 1em 0; }
+</style>
+
+
 <x:footer>
   Created 28 Jun 2022; &#160;
-  <!-- hhmts start -->Last modified: 20 Jul 2022<!-- hhmts end -->
+  <!-- hhmts start -->Last modified: 27 Jul 2022<!-- hhmts end -->
 </x:footer>
 #+end_export
