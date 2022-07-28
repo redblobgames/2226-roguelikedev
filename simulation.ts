@@ -42,7 +42,8 @@ function agentsMove(tickId) {
     const agents_per_tick = Math.min(agents.length, AGENT_MOVES_PER_TICK);
     for (let i = 0; i < agents_per_tick; i++) {
         let agent = agents[(tickId * agents_per_tick + i) % agents.length];
-        if (agent.fed === 0) { // no food, dead
+        if (agent.fed === 0) { // no food
+            // TODO: dead agents should turn into bones (items, not resources)
             return;
         }
         

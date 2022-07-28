@@ -8,6 +8,10 @@ export function clamp(x: number, lo: number, hi: number): number {
     return x < lo ? lo : x > hi ? hi : x;
 }
 
+export function unlerp(a: number, b: number, t: number): number {
+    return (t - a) / (b - a);
+}
+
 /** Exclusive randInt, like python's */
 export function randRange(lo: number, hi: number): number {
     return Math.floor(Math.random() * (hi-lo)) + lo;

@@ -8,7 +8,7 @@ export { print } from "./console";
 import * as input from "./input";
 import * as simulation from "./simulation";
 import { map, Edge } from "./map";
-import { clamp } from "./util";
+import { clamp, unlerp } from "./util";
 
 // Drawing area
 export const canvas = document.querySelector("#game") as HTMLCanvasElement;
@@ -114,6 +114,16 @@ export function render() {
                 let color = `hsl(${60+60*growth|0},${50*growth|0}%,50%)`;
                 if (resource.growth > simulation.PLANT_EDIBLE) color = "green";
                 drawTile(x, y, resource.appearance.sprite, color);
+                let berries = resource.appearance.sprite === 'cactus'
+                    ? [[0.6, 0.1], [0.2, 0.2], [0.9, 0.4]]
+                    : [[0.5, 0.1], [0.1, 0.3], [0.9, 0.3]];
+                let numBerries = clamp(3 * unlerp(simulation.PLANT_EDIBLE, 100, resource.growth), 0, 3);
+                for (let [dx, dy] of berries.slice(0, numBerries)) {
+                    ctx.fillStyle = "red";
+                    ctx.beginPath();
+                    ctx.arc(x+dx, y+dy, 0.1, 0, 2*Math.PI);
+                    ctx.fill();
+                }
             }
         }
     }

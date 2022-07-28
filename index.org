@@ -606,7 +606,7 @@ Next week, I'll work on the job system where NPCs look for resources.
 
 I don't have enemies. I have allies. I considered some limited combat in the form of hunting for food, but I need to keep the scope of this project down, so no hunting. Instead, this week I will work on the job system. Initially, the jobs will be to eat food when hungry, as described in the previous section.
 
-I broke this down into smaller parts. First, I wanted the agents to eat when they're hungry *and* they're standing on food.
+I broke this down into smaller parts. First, I wanted the agents to eat when they're hungry *and* they're walking over food.
 
 #+begin_export html
 <figure>
@@ -614,6 +614,19 @@ I broke this down into smaller parts. First, I wanted the agents to eat when the
   <figcaption>Chickens get hungry (orange, red) and die (black)</figcaption>
 </figure>
 #+end_export
+
+I decided it wasn't obvious which plants had food and which didn't, so I changed the graphics to show up to three berries per plant:
+
+#+begin_export html
+<figure>
+  <img src="screenshots/section-6b-berries.png" />
+  <figcaption>Plants have berries when edible</figcaption>
+</figure>
+#+end_export
+
+It was cool to watch the chickens walk past a plant and eat some berries. But all the chickens died, because they don't walk /towards/ plants when hungry. They're just walking randomly at this point.
+
+So the next step is to have the chickens decide where to walk. If they're hungry, they'll look for nearby food. If they're not hungry, they'll pick a random place on the map.
 
 In RimWorld and Two Point Hospital, the job objects reserve space for standing. I think that's a good idea, but I don't yet have job objects (carpenter table, kitchen stove, etc.).
 
