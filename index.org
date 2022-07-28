@@ -606,7 +606,14 @@ Next week, I'll work on the job system where NPCs look for resources.
 
 I don't have enemies. I have allies. I considered some limited combat in the form of hunting for food, but I need to keep the scope of this project down, so no hunting. Instead, this week I will work on the job system. Initially, the jobs will be to eat food when hungry, as described in the previous section.
 
-I broke this down into smaller parts. First, I wanted the agents to eat when they're hungry *and* they're walking over food.
+I broke this down into smaller parts.
+
+** Eating
+:PROPERTIES:
+:CUSTOM_ID: 7-eating
+:END:
+
+First, I wanted the agents to eat when they're hungry *and* they're walking over food.
 
 #+begin_export html
 <figure>
@@ -626,9 +633,14 @@ I decided it wasn't obvious which plants had food and which didn't, so I changed
 
 It was cool to watch the chickens walk past a plant and eat some berries. But all the chickens died, because they don't walk /towards/ plants when hungry. They're just walking randomly at this point.
 
-So the next step is to have the chickens decide where to walk. If they're hungry, they'll look for nearby food. If they're not hungry, they'll pick a random place on the map.
+** Finding food
+:PROPERTIES:
+:CUSTOM_ID: 7-pathfinding
+:END:
 
-In RimWorld and Two Point Hospital, the job objects reserve space for standing. I think that's a good idea, but I don't yet have job objects (carpenter table, kitchen stove, etc.).
+The next step is to have the chickens decide where to walk. If they're hungry, they'll look for nearby food. If they're not hungry, they'll pick a random place on the map.
+
+I had to decide where this code lived. My first thought was that the code that increases hunger would see if it exceeded a threshold, and that's when I would tell the chicken to go look for food. But the other way would be when the chicken is periodically evaluating its options, it can consider hunger as part of its decision-making process. I decided that I would rather keep the entire goal-setting process in one place. That way if there are conflicts, they can be resolved in a single function instead of the logic being spread out in many systems.
 
 * TODO Interface
 :PROPERTIES:
@@ -654,6 +666,7 @@ One of the things I very much want in a game of this style is gradual progressio
 - I'd like exploration to (1) be interesting, (2) lead to different base designs. Factorio is the worst at this. Not only is exploration uninteresting, the designs aren't driven by the map. Oxygen Not Included has been pretty good about this. Not only do you find objects and creatures while exploring, the varied biomes give you a lot of variety in base layout.
 - Some of these games have an inside/outside boundary. In Dwarf Fortress and RimWorld you have a colony ("inside") where you build things and a bigger world ("outside") which has encounters and raiders and traders. Factorio is all inside. Prison Architect, SimAirport, and similar games have supplies and people coming from the outside, and even have a map object (major road) to mark this.
 - Some games have a lot of buildable objects, but sometimes they only fit within certain rooms. Another Brick in the Mall and Honey I Joined a Cult are examples that have /long/ lists of objects, only some applicable. I want to avoid this.  But that's easy in my case because I won't have time to make lots of objects. Oxygen Not Included, Rimworld, and others will put them into categories.
+- In RimWorld and Two Point Hospital, the job objects reserve space for standing.
 - A minor complaint about some of these games: if there's time between when I build something and when it's built, I want to be able to /configure/ the object before it's built. I don't want to have to remember to come back to configure it. I'd like to handle this properly in my project but it's a low priority compared to all the other things.
 
 So what systems could I implement? With the big caveat that I won't time for all of them:

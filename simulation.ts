@@ -6,7 +6,7 @@
 
 import { Agent } from "./entity";
 import { map, Point } from "./map";
-import { sign, randInt } from "./util";
+import { sign, randInt, randRange } from "./util";
 
 export const TICKS_PER_SECOND = 10;
 export const AGENT_MOVES_PER_TICK = 3;
@@ -32,6 +32,27 @@ export function install(render_: () => void) {
     render = render_;
 }
 
+function nearbyFood(p: Point): Point | null {
+    // inefficient code but good enough for now
+    const R = 10;
+    let {left, top, right, bottom} = map.bounds;
+    left = Math.max(left, p.x - R);
+    right = Math.min(right, p.x + R);
+    top = Math.max(top, p.y - R);
+    bottom = Math.max(bottom, p.y + R);
+
+    let candidates = [];
+    for (let y = top; y <= bottom; y++) {
+        for (let x = left; x <= right; x++) {
+            let resource = map.resources.get({x, y});
+            if (resource && resource.growth > PLANT_EDIBLE) {
+                candidates.push({x, y});
+            }
+        }
+    }
+    return candidates.length === 0? null : candidates[randRange(0, candidates.length)];
+}
+
 function moveAgentTo(agent: Agent, p: Point) {
     if (map.inBounds(p)) {
         agent.location = {x: p.x, y: p.y};
@@ -42,16 +63,19 @@ function agentsMove(tickId) {
     const agents_per_tick = Math.min(agents.length, AGENT_MOVES_PER_TICK);
     for (let i = 0; i < agents_per_tick; i++) {
         let agent = agents[(tickId * agents_per_tick + i) % agents.length];
-        if (agent.fed === 0) { // no food
+        if (agent.health === 0) { // no food
             // TODO: dead agents should turn into bones (items, not resources)
             return;
         }
         
+        if (!agent.dest && agent.health < AGENT_HUNGRY) { // find food
+            agent.dest = nearbyFood(agent.location);
+        }
         if (!agent.dest) {
             agent.dest = {
                 x: randInt(map.bounds.left, map.bounds.right),
                 y: randInt(map.bounds.top, map.bounds.bottom)
-            };
+                };
         }
 
         let dx = agent.dest.x - agent.location.x;
@@ -70,14 +94,14 @@ function agentsGetHungry(tickId) {
     if (tickId % TICKS_PER_AGENT_HUNGER !== 0) return;
 
     for (let agent of agents) {
-        if (agent.fed > 0) agent.fed--;
-        if (agent.fed < AGENT_HUNGRY) {
+        if (agent.health > 0) agent.health--;
+        if (agent.health < AGENT_HUNGRY) {
             // consider eating
             let resource = map.resources.get(agent.location);
             // TODO: check if it's a food resource
             if (resource && resource.growth > PLANT_EDIBLE) {
-                let meal = Math.min(30, 100-agent.fed);
-                agent.fed += meal;
+                let meal = Math.min(30, 100-agent.health);
+                agent.health += meal;
                 resource.growth -= meal;
             }
         }

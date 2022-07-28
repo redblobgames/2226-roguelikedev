@@ -194,10 +194,10 @@ export function render() {
         if (view.left <= x && x <= view.right
             && view.top <= y && y <= view.bottom) {
             let color = "yellow";
-            if (agent.fed < simulation.AGENT_HUNGRY) color = "orange";
-            if (agent.fed < simulation.AGENT_STARVING) color = "red";
-            if (agent.fed === 0) color = "black";
-            if (agent.fed < 0) color = "purple"; // debugging
+            if (agent.health < simulation.AGENT_HUNGRY) color = "orange";
+            if (agent.health < simulation.AGENT_STARVING) color = "red";
+            if (agent.health === 0) color = "black";
+            if (agent.health < 0) color = "purple"; // debugging
             drawTile(x, y, agent.appearance.sprite, color);
         }
     }

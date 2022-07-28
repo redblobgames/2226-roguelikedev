@@ -16,11 +16,11 @@ export type Appearance = {sprite: string};
  */
 export class Agent {
     dest: Point | null = null;
-    fed: number = 0;
+    health: number = 0;
     constructor (public id: string,
                  public location: Point,
                  public appearance: Appearance) {
-        this.fed = randInt(0, 100);
+        this.health = randInt(0, 100);
     }
 }
 
