@@ -50,6 +50,8 @@ function nearbyFood(p: Point): Point | null {
             }
         }
     }
+    function distance(a, b) { return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y)); }
+    candidates.sort((a, b) => distance(a, p) - distance(b, p));
     return candidates.length === 0? null : candidates[randRange(0, candidates.length)];
 }
 
@@ -75,7 +77,7 @@ function agentsMove(tickId) {
             agent.dest = {
                 x: randInt(map.bounds.left, map.bounds.right),
                 y: randInt(map.bounds.top, map.bounds.bottom)
-                };
+            };
         }
 
         let dx = agent.dest.x - agent.location.x;

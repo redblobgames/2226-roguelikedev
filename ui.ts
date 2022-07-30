@@ -182,13 +182,9 @@ export function render() {
     ctx.restore();
     
     
-    // TODO: tile foregrounds
-    
     // Agents are drawn on top of most everything else (except the cursor)
     ctx.save();
     ctx.lineJoin = 'bevel'; // some of the game-icons have sharp corners
-    ctx.lineWidth = 1/(TILE_SIZE/512);
-    ctx.strokeStyle = "black";
     for (let agent of simulation.agents) {
         let {x, y} = agent.location;
         if (view.left <= x && x <= view.right
@@ -198,6 +194,16 @@ export function render() {
             if (agent.health < simulation.AGENT_STARVING) color = "red";
             if (agent.health === 0) color = "black";
             if (agent.health < 0) color = "purple"; // debugging
+            if (agent.dest && agent.health > 0) {
+                ctx.strokeStyle = "white";
+                ctx.lineWidth = 0.02;
+                ctx.beginPath();
+                ctx.moveTo(x + 0.5, y + 0.5);
+                ctx.lineTo(agent.dest.x + 0.5, agent.dest.y + 0.5);
+                ctx.stroke();
+            }
+            ctx.lineWidth = 1/(TILE_SIZE/512);
+            ctx.strokeStyle = "black";
             drawTile(x, y, agent.appearance.sprite, color);
         }
     }
