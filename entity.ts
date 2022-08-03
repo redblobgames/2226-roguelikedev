@@ -20,7 +20,7 @@ export class Agent {
     constructor (public id: string,
                  public location: Point,
                  public appearance: Appearance) {
-        this.health = randInt(0, 100);
+        this.health = randInt(50, 100);
     }
 }
 
@@ -30,7 +30,7 @@ export class Resource {
     constructor (public id: string,
                  public location: Point,
                  public appearance: Appearance) {
-        this.growth = randInt(0, 100);
+        this.growth = randInt(0, 80);
     }
 }
 

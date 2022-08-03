@@ -4,7 +4,7 @@
  * License: Apache-2.0 <http://www.apache.org/licenses/LICENSE-2.0.html>
  */
 
-import { randInt } from "./util";
+import { randInt, randFloat } from "./util";
 import { Resource } from "./entity";
 
 export type Point = {x: number, y: number};
@@ -83,8 +83,8 @@ export class GameMap {
 
     constructor() {
         function tweakNumber(n: number, halfprob=0.3): number {
-            if (Math.random() < halfprob) return n-1;
-            if (Math.random() < halfprob) return n+1;
+            if (randFloat() < halfprob) return n-1;
+            if (randFloat() < halfprob) return n+1;
             return n;
         }
         
@@ -111,9 +111,9 @@ export class GameMap {
                     : x < riverX + plainsStart + plainsWidth ? 'plains'
                     : 'desert';
                 this.tiles.set({x, y}, tileType);
-                if (tileType === 'grass' && randInt(1, 100) <= 5) {
+                if (tileType === 'grass' && randInt(1, 100) <= 10) {
                     this.resources.set({x, y}, new Resource(`berry-plant-${x},${y}`, {x, y}, {sprite: 'sprout'}));
-                } else if (tileType === 'plains' && randInt(1, 100) <= 20) {
+                } else if (tileType === 'plains' && randInt(1, 100) <= 3) {
                     this.resources.set({x, y}, new Resource(`tree-${x},${y}`, {x, y}, {sprite: 'cactus'}));
                 }
             }
