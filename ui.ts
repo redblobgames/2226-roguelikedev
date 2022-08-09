@@ -18,9 +18,8 @@ export const ctx = canvas.getContext('2d');
 const TILE_SIZE = 25;
 const VIEWWIDTH = canvas.width / TILE_SIZE;
 const VIEWHEIGHT = canvas.height / TILE_SIZE;
-// if (VIEWWIDTH % 1.0 !== 0.0 || VIEWHEIGHT % 1.0 !== 0.0) assert("Tile size mismatch");
 
-if (window.devicePixelRatio && window.devicePixelRatio != 1) {
+if (window.devicePixelRatio && window.devicePixelRatio !== 1) {
     // Handle hi-dpi displays
     canvas.width *= window.devicePixelRatio;
     canvas.height *= window.devicePixelRatio;
@@ -45,6 +44,7 @@ export const sprites = {
     cactus:     S(require("./game-icons/delapouite/cactus.svg")),
     door:       S(require("./game-icons/delapouite/door.svg")),
     move:       S(require("./game-icons/delapouite/move.svg")),
+    square:     S(require("./game-icons/delapouite/square.svg")),
     sprout:     S(require("./game-icons/lorc/sprout.svg")),
     thor_hammer: S(require("./game-icons/delapouite/thor-hammer.svg")),
 };
@@ -205,6 +205,10 @@ export function render() {
             ctx.lineWidth = 1/(TILE_SIZE/512);
             ctx.strokeStyle = "black";
             drawTile(x, y, agent.appearance.sprite, color);
+            ctx.font = '0.4px monospace';
+            ctx.fillStyle = "white";
+            ctx.textAlign = 'center';
+            ctx.fillText(agent.id, x+0.5, y+0.8);
         }
     }
 

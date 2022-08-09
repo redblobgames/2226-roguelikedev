@@ -21,7 +21,7 @@ export let agents: Agent[] = [];
 
 for (let i = 0; i < 15; i++) { // dummy agents
     agents.push(
-        new Agent("agent-${i+1}",
+        new Agent(`agent-${i+1}`,
                   {x: 5 + i*3, y: 10},
                   {sprite: 'rooster'})
     );

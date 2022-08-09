@@ -4,6 +4,7 @@
  * License: Apache-2.0 <http://www.apache.org/licenses/LICENSE-2.0.html>
  */
 
+import { print, clear } from "./console";
 import { Point, map } from "./map";
 import * as simulation from "./simulation";
 
@@ -80,6 +81,23 @@ class MoveMode extends InputMode {
     override instructionsHtml = `Arrows to move; <kbd>R</kbd> to build room`;
     key_w() { setInputMode('wall'); }
     key_r() { setInputMode('room'); }
+
+    override render(drawTile) {
+        drawTile(this.x, this.y, 'square', "red");
+        // Display everything on this tile
+        clear();
+        print(`Tile @ ${this.x},${this.y}: ${map.tiles.get(this)}`, 'debug');
+        let resource = map.resources.get(this);
+        if (resource) {
+            print(`Resource: ${resource.id} growth=${resource.growth} type=${resource.appearance.sprite}`, 'debug');
+        }
+        for (let agent of simulation.agents) {
+            if (agent.location.x === this.x && agent.location.y === this.y) {
+                print(`${agent.id} @ ${agent.location.x},${agent.location.y} health=${agent.health} dest=${JSON.stringify(agent.dest)}`, 'debug');
+            }
+        }
+    }
+
 }
 
 class RoomMode extends InputMode {
@@ -124,26 +142,6 @@ class RoomMode extends InputMode {
         setInputMode('move');
     }
 }
-
-/*
-class WallMode extends InputMode {
-    path: Point[] = [];
-    override instructionsClass = 'wall';
-    override instructionsHtml = `Arrows to draw path; <kbd>Enter</kbd> to save; <kbd>Esc</kbd> to cancel`;
-    override moved() {
-        this.path.push({x: this.x, y: this.y});
-        // TODO: reversing over path should pop
-        // TODO: need to draw current path
-    }
-    key_Escape()     { setInputMode('move'); }
-    key_Enter()      {
-        for (let p of this.path) {
-            map.objects.set(p, 'wall');
-        }
-        setInputMode('move');
-    }
-}
-*/
 
 export let current: InputMode = new MoveMode(5, 5);
 export function setInputMode(mode: 'move' | 'room' | 'wall') {

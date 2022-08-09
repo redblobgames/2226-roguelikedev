@@ -29,6 +29,10 @@ function drawMessages() {
     messageBox.scrollTop = messageBox.scrollHeight;
 }
 
+export function clear() {
+    messages.splice(0);
+}
+
 export function print(message: string, className: string) {
     messages.push([message, className]);
     messages.splice(0, messages.length - MAX_MESSAGE_LINES);

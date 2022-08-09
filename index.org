@@ -2,15 +2,15 @@
 #+date: <2022-06-28 Tue>
 #+options: toc:nil
 
-Each summer r/roguelikedev has a [[https://old.reddit.com/r/roguelikedev/wiki/python_tutorial_series][summer event]] in which we all make a simple roguelike, roughly following the libtcod roguelike tutorial. I've tried several times and [[href:/x/2025-roguelike-dev/][actually finished in 2020]], using [[https://ondras.github.io/rot.js/hp/][rot.js]] and Javascript. I kept the scope down by implementing only the topics from the tutorial. Then [[href:/x/2126-roguelike-dev/][in 2021]] I implemented topics I wanted to try: thin walls, graphics, animations, openable doors, new map generator. I had many more things I wanted to try but I was too ambitious, and didn't finish.
-
-For this year's summer event I'd like to do something more "fortress mode" and less "adventure mode".  This may prove too ambitious; we shall see. This project for me is not about making a complete, fun, polished game. It's about exploring what a "fortress mode" game might involve.
+Each summer r/roguelikedev has a [[https://old.reddit.com/r/roguelikedev/wiki/python_tutorial_series][summer event]] in which we all make a simple roguelike, roughly following the libtcod roguelike tutorial. For this year's summer event I'd like to do something more "fortress mode" and less "adventure mode".  This may prove too ambitious; we shall see.
 
 #+include: "game.html" export html
 
 Icons from [[https://game-icons.net][game-icons.net]], CC BY 3.0. Code repository [[https://github.com/redblobgames/2226-roguelikedev][on github]].
 
 #+TOC: headlines 2
+
+ I've participated in the event several times and [[href:/x/2025-roguelike-dev/][actually finished in 2020]], using [[https://ondras.github.io/rot.js/hp/][rot.js]] and Javascript. I kept the scope down by implementing only the topics from the tutorial. Then [[href:/x/2126-roguelike-dev/][in 2021]] I implemented topics I wanted to try: thin walls, graphics, animations, openable doors, new map generator. I had many more things I wanted to try but I was too ambitious, and didn't finish.  These projects for me are not about making a complete, fun, polished game. This year it's about exploring what a "fortress mode" game might involve.
 
 * Setting up
 :PROPERTIES:
@@ -740,6 +740,6 @@ blockquote p { margin: 1em 0; }
 
 <x:footer>
   Created 28 Jun 2022; &#160;
-  <!-- hhmts start -->Last modified: 27 Jul 2022<!-- hhmts end -->
+  <!-- hhmts start -->Last modified: 02 Aug 2022<!-- hhmts end -->
 </x:footer>
 #+end_export
