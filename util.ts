@@ -4,8 +4,29 @@
  * License: Apache-2.0 <http://www.apache.org/licenses/LICENSE-2.0.html>
  */
 
+export type Rect = {
+    left: number;
+    right: number;
+    top: number;
+    bottom: number;
+};
+
 export function clamp(x: number, lo: number, hi: number): number {
     return x < lo ? lo : x > hi ? hi : x;
+}
+
+export function intersectRectangle(a: Rect, b: Rect): Rect {
+    let rect = {
+        left: Math.max(a.left, b.left),
+        right: Math.min(a.right, b.right),
+        top: Math.max(a.top, b.top),
+        bottom: Math.min(a.bottom, b.bottom),
+    };
+    if (rect.left <= rect.right && rect.top <= rect.bottom) {
+        return rect;
+    } else {
+        return {left: 0, right: 0, top: 0, bottom: 0};
+    }
 }
 
 export function unlerp(a: number, b: number, t: number): number {
@@ -46,7 +67,7 @@ function PRNG(seed: number): {
     };
 }
 
-let prng = PRNG(12345);
+let prng = PRNG(Math.random() * 100000 | 0);
 
 export function randFloat(): number {
     return prng.nextFloat();

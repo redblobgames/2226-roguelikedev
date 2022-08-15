@@ -4,14 +4,14 @@
  * License: Apache-2.0 <http://www.apache.org/licenses/LICENSE-2.0.html>
  */
 
-import { randInt, randFloat } from "./util";
+import { randInt, randFloat, Rect } from "./util";
 import { Resource } from "./entity";
 
 export type Point = {x: number, y: number};
 export type Side = 'W' | 'N';
 export type Edge = {x: number; y: number; s: Side};
 
-const MAP_BOUNDS = {
+const MAP_BOUNDS: Rect = {
     left: 0,
     top: 0,
     right: 60,
@@ -97,7 +97,7 @@ export class GameMap {
         
         let riverX = 10;
         let plainsStart = 20;
-        let plainsWidth = 10;
+        let plainsWidth = 15;
         for (let y = top; y <= bottom; y++) {
             riverX = Math.max(3, tweakNumber(riverX));
             plainsStart = Math.max(5, tweakNumber(plainsStart));
@@ -111,9 +111,9 @@ export class GameMap {
                     : x < riverX + plainsStart + plainsWidth ? 'plains'
                     : 'desert';
                 this.tiles.set({x, y}, tileType);
-                if (tileType === 'grass' && randInt(1, 100) <= 10) {
+                if (tileType === 'grass' && randInt(1, 100) <= 5) {
                     this.resources.set({x, y}, new Resource(`berry-plant-${x},${y}`, {x, y}, {sprite: 'sprout'}));
-                } else if (tileType === 'plains' && randInt(1, 100) <= 3) {
+                } else if (tileType === 'plains' && randInt(1, 100) <= 2) {
                     this.resources.set({x, y}, new Resource(`tree-${x},${y}`, {x, y}, {sprite: 'cactus'}));
                 }
             }

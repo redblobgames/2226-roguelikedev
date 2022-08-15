@@ -83,7 +83,7 @@ class MoveMode extends InputMode {
     key_r() { setInputMode('room'); }
 
     override render(drawTile) {
-        drawTile(this.x, this.y, 'square', "red");
+        drawTile(this.x, this.y, 'square', "magenta");
         // Display everything on this tile
         clear();
         print(`Tile @ ${this.x},${this.y}: ${map.tiles.get(this)}`, 'debug');

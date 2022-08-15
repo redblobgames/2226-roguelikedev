@@ -6,7 +6,7 @@
 
 import { Agent } from "./entity";
 import { map, Point } from "./map";
-import { sign, randInt, randRange } from "./util";
+import { sign, randInt, randRange, intersectRectangle } from "./util";
 
 export const TICKS_PER_SECOND = 10;
 export const AGENT_MOVES_PER_TICK = 3;
@@ -21,7 +21,7 @@ export let agents: Agent[] = [];
 
 for (let i = 0; i < 15; i++) { // dummy agents
     agents.push(
-        new Agent(`agent-${i+1}`,
+        new Agent(`A${i+1}`,
                   {x: 5 + i*3, y: 10},
                   {sprite: 'rooster'})
     );
@@ -61,22 +61,30 @@ function moveAgentTo(agent: Agent, p: Point) {
     }
 }
 
-function agentsMove(tickId) {
+function agentsMove(tickId: number) {
     const agents_per_tick = Math.min(agents.length, AGENT_MOVES_PER_TICK);
     for (let i = 0; i < agents_per_tick; i++) {
         let agent = agents[(tickId * agents_per_tick + i) % agents.length];
         if (agent.health === 0) { // no food
             // TODO: dead agents should turn into bones (items, not resources)
-            return;
+            continue;
         }
-        
+
         if (!agent.dest && agent.health < AGENT_HUNGRY) { // find food
             agent.dest = nearbyFood(agent.location);
         }
         if (!agent.dest) {
+            const R = 7;
+            let bounds = {
+                left: agent.location.x - R,
+                right: agent.location.x + R,
+                top: agent.location.y - R,
+                bottom: agent.location.y + R,
+            };
+            bounds = intersectRectangle(bounds, map.bounds);
             agent.dest = {
-                x: randInt(map.bounds.left, map.bounds.right),
-                y: randInt(map.bounds.top, map.bounds.bottom)
+                x: randInt(bounds.left, bounds.right),
+                y: randInt(bounds.top, bounds.bottom)
             };
         }
 
