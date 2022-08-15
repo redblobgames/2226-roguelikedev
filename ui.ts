@@ -206,9 +206,12 @@ export function render() {
             ctx.strokeStyle = "black";
             drawTile(x, y, agent.appearance.sprite, color);
             ctx.font = '0.4px monospace';
+            ctx.lineWidth = 2 / TILE_SIZE;
             ctx.fillStyle = "white";
             ctx.textAlign = 'center';
-            ctx.fillText(agent.id, x+0.5, y+0.8);
+            const label = agent.id.replace("agent-", "");
+            ctx.strokeText(label, x+0.5, y+0.9);
+            ctx.fillText(label, x+0.5, y+0.9);
         }
     }
 
