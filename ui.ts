@@ -8,14 +8,14 @@ export { print } from "./console";
 import * as input from "./input";
 import * as simulation from "./simulation";
 import { map, Edge } from "./map";
-import { clamp, unlerp } from "./util";
+import { DEBUG, clamp, unlerp } from "./util";
 
 // Drawing area
 export const canvas = document.querySelector("#game") as HTMLCanvasElement;
 export const ctx = canvas.getContext('2d');
 
 // Tile map view
-const TILE_SIZE = 25;
+const TILE_SIZE = DEBUG? 12 : 25;
 const VIEWWIDTH = canvas.width / TILE_SIZE;
 const VIEWHEIGHT = canvas.height / TILE_SIZE;
 

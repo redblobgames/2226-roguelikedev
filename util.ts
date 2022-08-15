@@ -4,6 +4,8 @@
  * License: Apache-2.0 <http://www.apache.org/licenses/LICENSE-2.0.html>
  */
 
+export const DEBUG = false; // increase speed and decrease tile size
+
 export type Rect = {
     left: number;
     right: number;

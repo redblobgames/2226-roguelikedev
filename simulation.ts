@@ -6,9 +6,9 @@
 
 import { Agent } from "./entity";
 import { map, Point } from "./map";
-import { sign, randInt, randRange, intersectRectangle } from "./util";
+import { DEBUG, sign, randInt, randRange, intersectRectangle } from "./util";
 
-export const TICKS_PER_SECOND = 10;
+export const TICKS_PER_SECOND = DEBUG? 100 : 15;
 export const AGENT_MOVES_PER_TICK = 3;
 export const TICKS_PER_PLANT_GROWTH = 10;
 export const TICKS_PER_AGENT_HUNGER = 5;
