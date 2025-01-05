@@ -1,4 +1,4 @@
-#+title: Roguelike Dev
+#+title: Summer Roguelike project
 #+date: <2022-06-28 Tue>
 #+options: toc:nil
 
@@ -663,7 +663,7 @@ I had some bugs that took some time to figure out. The main one was that I would
 
 I used to write simulations and then come up with the interface, but I think that leads to parts of the simulation the player can't see. These days I instead want to start with the interface. What does the player experience? What can they see? If they can't see it, is it useful to simulate? What are the decisions they need to make, and what information do they need to make those decisions?
 
-I realized I need to at least start thinking about this early in the project. I looked through my notes for other games I've liked: Dwarf Fortress, Rimworld, Oxygen Not Included, Factorio, Prison Architect, SimAirport, Airport CEO, Transport Tycoon, Two Point Hospital, Honey I Joined A Cult, Another Brick in the Mall, Academia School Simulator, Overcrowd.
+I realized I need to at least start thinking about this early in the project. I looked through my notes for other games I've liked: Dwarf Fortress, Rimworld, Oxygen Not Included, Factorio, Prison Architect, SimAirport, Airport CEO, Transport Tycoon, Two Point Hospital, Honey I Joined A Cult, Another Brick in the Mall, Academia School Simulator, Overcrowd, Evil Genius 2.
 
 You'll start out with a handful of colonists, and some supplies, similar to Dwarf Fortress, Rimworld, ONI. You're trying to provide food, shelter, dining, entertainment, medicine for your colonists. 
 
@@ -672,15 +672,15 @@ One of the things I very much want in a game of this style is gradual progressio
 - Many games gate this through a tech tree. Other progression involves number of people, the skills of those people, or advanced materials. I would like progression of some sort but I fear it may be out of scope for this project.
 - I want to encourage /redesign/, not up front design. I like that Factorio has zero cost of moving something. In games with digging/mining, that's usually not undoable so it discourages redesign. Some games actively make this hard, like Airport CEO not allowing me to change a gate without shutting it down, but to shut it down I have to sit there and wait a long time before no airplanes want to use the gate.
 - I want to see more systems as you progress through the game. Some games introduce too many systems early on. Prison Architect especially requires you to build lots of rooms before you can even open your prison, and then there are too few things to do later on. RimWorld seems pretty good about this, by allowing you to rely on your initial supplies and what you can find in nature. But I am not sure my game will be big enough for this to matter.
-- I want to see the systems progress from low cost low return to high cost high return. For example in Oxygen Not Included the hamster wheel power is easy to set up, but doesn't provide a lot of power, and does so at high cost. Later systems like petroleum power take a lot more investment but provide much more power.
-- Although I like games with indiviudal personalities and skills per colonist, I think that I'm going to not pursue that for this project. It only works for a small number of colonists, and I don't think I will have enough time to work on this anyway.
+- I want to see the systems progress from low cost low return to high cost high return. For example in Oxygen Not Included the hamster wheel power is easy (low time and material cost) to set up, but doesn't provide a lot of power. Later systems like petroleum power take a lot more investment (high time and material cost) but provide much more power.
+- Although I like games with individual personalities and skills per colonist, I think that I'm going to not pursue that for this project. It only works for a small number of colonists, and I don't think I will have enough time to work on this anyway.
 - I want to make system problems visible. In Factorio you can scan for bottlenecks, and use signals and speakers to flag problems. In Airport CEO on the other hand it seemed hard to find out what's wrong or how to fix it.
 - I don't want to use grants/contracts/quests to push early progression. I feel like Prison Architect inspired other games (SimAiport, Airport CEO, Academia School Simulator) to do this. Those games required you to build too many systems up front so it seemed reasonable to have a system to help you prioritize other systems. But I'd rather do this by having fewer systems to work with early on, so that the choices are more clear.
 - A lot of these games end up with me sitting around waiting for something to happen. Then they offer "VCR controls" (pause, play, fast forward) to help you deal with too many events (pause) or too few events (fast forward). It seems like a common problem, which I want solved through game design. I think Transport Tycoon and Factorio have been best at avoiding this problem, for reasons I won't write about here. But given that the scope of this project does /not/ include balance and fun, I am not planning to even try solving this problem here.
 - I'd like exploration to (1) be interesting, (2) lead to different base designs. Factorio is the worst at this. Not only is exploration uninteresting, the designs aren't driven by the map. Oxygen Not Included has been pretty good about this. Not only do you find objects and creatures while exploring, the varied biomes give you a lot of variety in base layout.
-- Some of these games have an inside/outside boundary. In Dwarf Fortress and RimWorld you have a colony ("inside") where you build things and a bigger world ("outside") which has encounters and raiders and traders. Factorio is all inside. Prison Architect, SimAirport, and similar games have supplies and people coming from the outside, and even have a map object (major road) to mark this.
-- Some games have a lot of buildable objects, but sometimes they only fit within certain rooms. Another Brick in the Mall and Honey I Joined a Cult are examples that have /long/ lists of objects, only some applicable. I want to avoid this.  But that's easy in my case because I won't have time to make lots of objects. Oxygen Not Included, Rimworld, and others will put them into categories.
-- In RimWorld and Two Point Hospital, the job objects reserve space for standing.
+- Some of these games have an inside/outside boundary. In Dwarf Fortress and RimWorld you have a colony ("inside") where you build things and a bigger world ("outside") which has encounters and raiders and traders. Factorio is all inside. Prison Architect, SimAirport, and similar games have supplies and people coming from the outside, and even have a map object (major road) to mark this. Evil Genius 2 has your people go out to the world, and also people from the world come into your base.
+- Some games have a lot of buildable objects, but sometimes they only fit within certain rooms. Another Brick in the Mall and Honey I Joined a Cult are examples that have /long/ lists of objects, only some applicable. I want to avoid this.  But that's easy in my case because I won't have time to make lots of objects. Oxygen Not Included, Rimworld, and others will put them into categories. Evil Genius 2 filters the list to only the ones applicable to the room you're working on.
+- In RimWorld, Two Point Hospital, and Evil Genius 2, the job objects reserve space for standing. I like this.
 - A minor complaint about some of these games: if there's time between when I build something and when it's built, I want to be able to /configure/ the object before it's built. I don't want to have to remember to come back to configure it. I'd like to handle this properly in my project but it's a low priority compared to all the other things.
 
 So what systems could I implement? With the big caveat that I won't time for all of them:
@@ -784,6 +784,6 @@ blockquote p { margin: 1em 0; }
 
 <x:footer>
   Created 28 Jun 2022; &#160;
-  <!-- hhmts start -->Last modified: 16 Aug 2022<!-- hhmts end -->
+  <!-- hhmts start -->Last modified: 26 Jun 2023<!-- hhmts end -->
 </x:footer>
 #+end_export
